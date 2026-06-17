@@ -1,0 +1,1416 @@
+basePath: /api/v1
+definitions:
+  entities.AdminLoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  entities.AdminLoginResponse:
+    properties:
+      role:
+        type: string
+      token:
+        type: string
+    type: object
+  entities.AnomalyItem:
+    properties:
+      anomaly_score:
+        type: number
+      category:
+        type: string
+      price:
+        type: number
+      product_id:
+        type: string
+      product_name:
+        type: string
+      unit:
+        type: string
+    type: object
+  entities.CheckPointRequest:
+    properties:
+      lat:
+        maximum: 90
+        minimum: -90
+        type: number
+      lng:
+        maximum: 180
+        minimum: -180
+        type: number
+    required:
+    - lat
+    - lng
+    type: object
+  entities.CheckPointResponse:
+    properties:
+      distance_km:
+        type: number
+      in_radius:
+        type: boolean
+      radius_km:
+        type: number
+    type: object
+  entities.ClassifyProductRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  entities.ClassifyProductResponse:
+    properties:
+      category:
+        type: string
+      confidence:
+        type: number
+      original_name:
+        type: string
+      standard_id:
+        type: integer
+      standard_name:
+        type: string
+    type: object
+  entities.CreateProductRequest:
+    properties:
+      category:
+        maxLength: 100
+        minLength: 1
+        type: string
+      description:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+      price:
+        type: number
+      unit:
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - category
+    - name
+    - price
+    - unit
+    type: object
+  entities.DetectColumnsResponse:
+    properties:
+      columns:
+        items:
+          type: string
+        type: array
+    type: object
+  entities.DuplicatePair:
+    properties:
+      product_id_1:
+        type: string
+      product_id_2:
+        type: string
+      product_name_1:
+        type: string
+      product_name_2:
+        type: string
+      similarity_score:
+        type: number
+    type: object
+  entities.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  entities.GlobalMetrics:
+    properties:
+      active_users_24h:
+        type: integer
+      total_constructors:
+        type: integer
+      total_providers:
+        type: integer
+    type: object
+  entities.ImportError:
+    properties:
+      field:
+        type: string
+      message:
+        type: string
+      row:
+        type: integer
+    type: object
+  entities.ImportMapping:
+    properties:
+      column_map:
+        additionalProperties:
+          type: string
+        type: object
+      created_at:
+        type: string
+      id:
+        type: string
+      provider_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entities.ImportSummary:
+    properties:
+      errors:
+        items:
+          $ref: '#/definitions/entities.ImportError'
+        type: array
+      new_products:
+        type: integer
+      skipped_rows:
+        type: integer
+      total_rows:
+        type: integer
+      updated_products:
+        type: integer
+    type: object
+  entities.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  entities.LoginResponse:
+    properties:
+      requires_2fa:
+        type: boolean
+      temp_token:
+        type: string
+    type: object
+  entities.LogoutRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  entities.MetricsSummary:
+    properties:
+      contact_clicks:
+        type: integer
+      period:
+        type: string
+      total_budget_appearances:
+        type: integer
+    type: object
+  entities.Product:
+    properties:
+      active:
+        type: boolean
+      category:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      provider_id:
+        type: string
+      unit:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entities.ProviderLocation:
+    properties:
+      delivery_radius_km:
+        type: number
+      id:
+        type: string
+      lat:
+        type: number
+      lng:
+        type: number
+      provider_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  entities.ProviderMapPin:
+    properties:
+      business_name:
+        type: string
+      city:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      latitude:
+        type: number
+      longitude:
+        type: number
+      state:
+        type: string
+    type: object
+  entities.RefreshRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  entities.RegisterRequest:
+    properties:
+      business_name:
+        maxLength: 255
+        minLength: 2
+        type: string
+      email:
+        type: string
+      password:
+        minLength: 8
+        type: string
+      phone:
+        maxLength: 20
+        minLength: 10
+        type: string
+      rfc:
+        maxLength: 13
+        minLength: 12
+        type: string
+    required:
+    - business_name
+    - email
+    - password
+    - phone
+    - rfc
+    type: object
+  entities.RegisterResponse:
+    properties:
+      business_name:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      phone:
+        type: string
+      rfc:
+        type: string
+    type: object
+  entities.ResetPasswordRequest:
+    properties:
+      new_password:
+        minLength: 8
+        type: string
+      token:
+        type: string
+    required:
+    - new_password
+    - token
+    type: object
+  entities.SaveMappingRequest:
+    properties:
+      column_map:
+        additionalProperties:
+          type: string
+        type: object
+    required:
+    - column_map
+    type: object
+  entities.SetLocationRequest:
+    properties:
+      delivery_radius_km:
+        maximum: 500
+        type: number
+      lat:
+        maximum: 90
+        minimum: -90
+        type: number
+      lng:
+        maximum: 180
+        minimum: -180
+        type: number
+    required:
+    - delivery_radius_km
+    - lat
+    - lng
+    type: object
+  entities.TopProduct:
+    properties:
+      name:
+        type: string
+      product_id:
+        type: string
+      quote_count:
+        type: integer
+    type: object
+  entities.UpdateProductRequest:
+    properties:
+      category:
+        maxLength: 100
+        minLength: 1
+        type: string
+      description:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+      price:
+        type: number
+      unit:
+        maxLength: 50
+        minLength: 1
+        type: string
+    type: object
+  entities.VerifyOTPRequest:
+    properties:
+      code:
+        type: string
+    required:
+    - code
+    type: object
+  entities.VerifyOTPResponse:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  responses.APIResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: soporte@visionprice.app
+    name: VisionPrice Support
+  description: API backend para el módulo de Proveedores de VisionPrice
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: VisionPrice Proveedores API
+  version: "1.0"
+paths:
+  /api/v1/admin/geography/providers:
+    get:
+      description: Retorna ubicaciones de proveedores activos con datos seguros (sin
+        RFC, email, precios)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entities.ProviderMapPin'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Obtener pines de proveedores para el mapa (HU_SYS_02)
+      tags:
+      - Admin
+  /api/v1/admin/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica un usuario administrador y devuelve un JWT con rol USER_SYS_ADMIN
+      parameters:
+      - description: Credenciales de admin
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.AdminLoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.AdminLoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      summary: Login de administrador del sistema
+      tags:
+      - Admin
+  /api/v1/admin/metrics:
+    get:
+      description: Retorna conteo de constructores, proveedores y usuarios activos
+        en las últimas 24h
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.GlobalMetrics'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Obtener métricas globales del sistema (HU_SYS_01)
+      tags:
+      - Admin
+  /api/v1/auth/2fa/generate:
+    post:
+      consumes:
+      - application/json
+      description: Genera y envía un código OTP de 6 dígitos al proveedor (requiere
+        token temporal de login)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Generar código OTP
+      tags:
+      - 2FA
+  /api/v1/auth/2fa/verify:
+    post:
+      consumes:
+      - application/json
+      description: Valida el código OTP y emite tokens de acceso y refresh
+      parameters:
+      - description: Código OTP
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.VerifyOTPRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.VerifyOTPResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Verificar código OTP
+      tags:
+      - 2FA
+  /api/v1/auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: 'Envía un correo con un enlace para restablecer la contraseña (stub:
+        se registra en logs)'
+      parameters:
+      - description: Correo electrónico
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      summary: Solicitar recuperación de contraseña
+      tags:
+      - Auth
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica un proveedor con correo y contraseña. Retorna un token
+        temporal para el flujo de 2FA.
+      parameters:
+      - description: Credenciales de acceso
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      summary: Iniciar sesión
+      tags:
+      - Auth
+  /api/v1/auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Revoca el refresh token proporcionado para impedir su uso futuro
+      parameters:
+      - description: Refresh token a revocar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.LogoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Cerrar sesión
+      tags:
+      - Auth
+  /api/v1/auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Emite un nuevo access token usando un refresh token válido (verificando
+        que no esté revocado)
+      parameters:
+      - description: Refresh token
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  additionalProperties:
+                    type: string
+                  type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      summary: Refrescar access token
+      tags:
+      - Auth
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Crea una nueva cuenta de proveedor con nombre comercial, RFC, correo,
+        teléfono y contraseña
+      parameters:
+      - description: Datos de registro
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.RegisterResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      summary: Registrar un nuevo proveedor
+      tags:
+      - Auth
+  /api/v1/auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Restablece la contraseña usando el token de recuperación
+      parameters:
+      - description: Token y nueva contraseña
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      summary: Restablecer contraseña
+      tags:
+      - Auth
+  /api/v1/extractions/detect-columns:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Sube un archivo Excel y retorna las columnas detectadas en los
+        headers
+      parameters:
+      - description: Archivo Excel (.xlsx)
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.DetectColumnsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Detectar columnas de archivo Excel
+      tags:
+      - Extracciones
+  /api/v1/extractions/import:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Procesa un archivo Excel usando el mapeo guardado y crea/actualiza
+        productos
+      parameters:
+      - description: Archivo Excel (.xlsx)
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ImportSummary'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Importar productos desde Excel
+      tags:
+      - Extracciones
+  /api/v1/extractions/mapping:
+    get:
+      description: Retorna el mapeo de columnas configurado por el proveedor
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ImportMapping'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Obtener mapeo de columnas guardado
+      tags:
+      - Extracciones
+    post:
+      consumes:
+      - application/json
+      description: Guarda la correspondencia entre columnas del Excel y campos del
+        producto
+      parameters:
+      - description: Mapeo de columnas
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.SaveMappingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ImportMapping'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Guardar mapeo de columnas
+      tags:
+      - Extracciones
+  /api/v1/metrics/summary:
+    get:
+      description: Retorna métricas del proveedor — endpoint stub para desarrollo
+        futuro
+      parameters:
+      - default: month
+        description: 'Periodo: week o month'
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.MetricsSummary'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Obtener resumen de métricas (stub)
+      tags:
+      - Metrics
+  /api/v1/metrics/top-products:
+    get:
+      description: Retorna los top 3 productos más cotizados — endpoint stub para
+        desarrollo futuro
+      parameters:
+      - default: month
+        description: 'Periodo: week o month'
+        in: query
+        name: period
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entities.TopProduct'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Obtener top productos cotizados (stub)
+      tags:
+      - Metrics
+  /api/v1/ml/products/anomalies:
+    get:
+      description: Utiliza Isolation Forest comparando con el mercado global para
+        detectar precios anómalos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entities.AnomalyItem'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Detectar anomalías en precios
+      tags:
+      - Machine Learning
+  /api/v1/ml/products/classify:
+    post:
+      consumes:
+      - application/json
+      description: Utiliza TF-IDF y Similitud Coseno para mapear un nombre de producto
+        al catálogo maestro
+      parameters:
+      - description: Nombre del producto
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.ClassifyProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ClassifyProductResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Clasificar producto automáticamente
+      tags:
+      - Machine Learning
+  /api/v1/ml/products/duplicates:
+    get:
+      description: Encuentra posibles productos duplicados en el catálogo del proveedor
+        logueado usando TF-IDF
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entities.DuplicatePair'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Detectar productos duplicados
+      tags:
+      - Machine Learning
+  /api/v1/products:
+    get:
+      description: Retorna todos los productos activos del proveedor autenticado
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/entities.Product'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Listar productos activos
+      tags:
+      - Products
+    post:
+      consumes:
+      - application/json
+      description: Registra un nuevo material/producto para el proveedor autenticado
+      parameters:
+      - description: Datos del producto
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.CreateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.Product'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Crear un nuevo producto
+      tags:
+      - Products
+  /api/v1/products/{id}:
+    delete:
+      description: Desactiva un producto del proveedor autenticado (soft delete)
+      parameters:
+      - description: ID del producto
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Eliminar producto (baja lógica)
+      tags:
+      - Products
+    get:
+      description: Retorna un producto específico del proveedor autenticado
+      parameters:
+      - description: ID del producto
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.Product'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Obtener producto por ID
+      tags:
+      - Products
+    put:
+      consumes:
+      - application/json
+      description: Actualiza los datos de un producto existente del proveedor autenticado
+      parameters:
+      - description: ID del producto
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Datos a actualizar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.UpdateProductRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.Product'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Actualizar producto
+      tags:
+      - Products
+  /api/v1/providers/location:
+    get:
+      description: Retorna la ubicación actual y radio de entrega del proveedor
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ProviderLocation'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Obtener ubicación del proveedor
+      tags:
+      - Geolocations
+    put:
+      consumes:
+      - application/json
+      description: Guarda la latitud, longitud y radio de entrega del establecimiento
+      parameters:
+      - description: Datos de ubicación
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.SetLocationRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.ProviderLocation'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Fijar o actualizar ubicación del proveedor
+      tags:
+      - Geolocations
+  /api/v1/providers/location/check:
+    post:
+      consumes:
+      - application/json
+      description: Calcula la distancia entre un punto dado y la ubicación del proveedor,
+        y verifica si está dentro del radio
+      parameters:
+      - description: Coordenadas del punto a verificar
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entities.CheckPointRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/responses.APIResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/entities.CheckPointResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/responses.APIResponse'
+      security:
+      - BearerAuth: []
+      summary: Verificar si un punto está dentro del radio de entrega
+      tags:
+      - Geolocations
+securityDefinitions:
+  BearerAuth:
+    description: 'Ingrese el token JWT con el prefijo Bearer. Ejemplo: "Bearer {token}"'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

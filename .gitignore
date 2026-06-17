@@ -1,0 +1,77 @@
+# ==========================================
+# GOLANG BINARIES & CACHE
+# ==========================================
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+go.work
+
+# Directorios de compilación
+bin/
+build/
+dist/
+
+# ==========================================
+# SECRETS & ENVIRONMENT VARIABLES
+# ==========================================
+# NUNCA subir archivos .env ni claves
+.env
+.env.*
+!.env.example
+!example.env
+
+# Credenciales de Google/Firebase o AWS
+firebase-service-account.json
+*.pem
+*.key
+credentials.json
+client_secret.json
+
+# ==========================================
+# DATABASE & LOCAL DATA
+# ==========================================
+# SQL y bases locales
+*.sql
+*.sqlite
+*.db
+
+# Si se usa la CLI de Supabase
+supabase/.temp/
+.supabase/
+
+# ==========================================
+# ARCHIVOS TEMPORALES Y UPLOADS
+# ==========================================
+# Archivos subidos por los proveedores (ej. importación masiva)
+uploads/
+tmp/
+temp/
+*.xlsx
+*.xls
+*.csv
+
+# Logs del servidor
+logs/
+*.log
+
+# ==========================================
+# OS & IDE FILES
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Configuración de IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
