@@ -20,24 +20,27 @@ type Config struct {
 	CancelURL      string
 	Conekta        adapters.ConektaConfig
 	PayPal         adapters.PayPalConfig
+	// Plan code -> gateway plan id maps.
+	ConektaPlans map[string]string
+	PayPalPlans  map[string]string
 }
 
 // Init wires the payments feature (gateways, event store, use case) and routes.
 // subs is the subscriptions use case, satisfying the SubscriptionUpdater port.
 func Init(router *gin.RouterGroup, db *pgxpool.Pool, csrfManager *csrf.Manager, subs domain.SubscriptionUpdater, cfg Config, jwtSecret string) {
 	gateways := map[string]domain.PaymentGateway{
-		"conekta": adapters.NewConektaGateway(cfg.Conekta),
-		"paypal":  adapters.NewPayPalGateway(cfg.PayPal),
+		"conekta": adapters.NewConektaGateway(cfg.Conekta, cfg.ConektaPlans),
+		"paypal":  adapters.NewPayPalGateway(cfg.PayPal, cfg.PayPalPlans),
 	}
 
-	events := adapters.NewSupabasePaymentRepository(db)
+	repo := adapters.NewSupabasePaymentRepository(db)
 
 	useCase := payment_usecase.NewPaymentUseCase(payment_usecase.Config{
 		Enabled:        cfg.Enabled,
 		DefaultGateway: cfg.DefaultGateway,
 		SuccessURL:     cfg.SuccessURL,
 		CancelURL:      cfg.CancelURL,
-	}, gateways, events, subs)
+	}, gateways, repo, subs, repo)
 
 	controller := controllers.NewPaymentController(useCase)
 

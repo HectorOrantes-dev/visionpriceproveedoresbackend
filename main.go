@@ -137,6 +137,14 @@ func main() {
 			WebhookID:    cfg.PayPalWebhookID,
 			Env:          cfg.PayPalEnv,
 		},
+		ConektaPlans: map[string]string{
+			"pro": cfg.ConektaPlanPro,
+			"max": cfg.ConektaPlanMax,
+		},
+		PayPalPlans: map[string]string{
+			"pro": cfg.PayPalPlanPro,
+			"max": cfg.PayPalPlanMax,
+		},
 	}, cfg.JWTSecret)
 
 	// Swagger documentation (only enabled when ENABLE_SWAGGER=true)

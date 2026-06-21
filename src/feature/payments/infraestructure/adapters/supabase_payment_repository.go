@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -37,4 +38,19 @@ func (r *SupabasePaymentRepository) MarkProcessed(ctx context.Context, provider,
 	const q = `UPDATE payment_events SET processed = TRUE WHERE provider = $1 AND external_event_id = $2`
 	_, err := r.db.Exec(ctx, q, provider, externalEventID)
 	return err
+}
+
+// GetProviderContact returns the provider's business name and email, used to
+// create a customer at the payment gateway. Implements the ProviderDirectory port.
+func (r *SupabasePaymentRepository) GetProviderContact(ctx context.Context, providerID string) (string, string, error) {
+	pid, err := uuid.Parse(providerID)
+	if err != nil {
+		return "", "", fmt.Errorf("invalid provider id: %w", err)
+	}
+	const q = `SELECT business_name, email FROM providers WHERE id = $1 AND active = TRUE`
+	var name, email string
+	if err := r.db.QueryRow(ctx, q, pid).Scan(&name, &email); err != nil {
+		return "", "", fmt.Errorf("provider contact not found: %w", err)
+	}
+	return name, email, nil
 }

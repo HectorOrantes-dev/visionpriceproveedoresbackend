@@ -27,4 +27,8 @@ type SubscriptionRepository interface {
 
 	// UpsertFromWebhook applies a payment webhook update to the provider's subscription.
 	UpsertFromWebhook(ctx context.Context, in entities.WebhookUpdate) error
+
+	// FindProviderByExternalSubscription returns the provider id bound to a given
+	// gateway subscription id (used to resolve Conekta webhooks).
+	FindProviderByExternalSubscription(ctx context.Context, externalSubscriptionID string) (uuid.UUID, error)
 }

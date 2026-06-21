@@ -29,10 +29,14 @@ type Config struct {
 	SubscriptionCancelURL  string
 	ConektaPrivateKey      string
 	ConektaWebhookSecret   string
+	ConektaPlanPro         string
+	ConektaPlanMax         string
 	PayPalClientID         string
 	PayPalClientSecret     string
 	PayPalWebhookID        string
 	PayPalEnv              string
+	PayPalPlanPro          string
+	PayPalPlanMax          string
 }
 
 // Load reads environment variables from .env and returns a Config.
@@ -74,10 +78,14 @@ func Load() *Config {
 		SubscriptionCancelURL:  getEnv("SUBSCRIPTION_CANCEL_URL", ""),
 		ConektaPrivateKey:      getEnv("CONEKTA_PRIVATE_KEY", ""),
 		ConektaWebhookSecret:   getEnv("CONEKTA_WEBHOOK_SECRET", ""),
+		ConektaPlanPro:         getEnv("CONEKTA_PLAN_PRO", ""),
+		ConektaPlanMax:         getEnv("CONEKTA_PLAN_MAX", ""),
 		PayPalClientID:         getEnv("PAYPAL_CLIENT_ID", ""),
 		PayPalClientSecret:     getEnv("PAYPAL_CLIENT_SECRET", ""),
 		PayPalWebhookID:        getEnv("PAYPAL_WEBHOOK_ID", ""),
 		PayPalEnv:              getEnv("PAYPAL_ENV", "sandbox"),
+		PayPalPlanPro:          getEnv("PAYPAL_PLAN_PRO", ""),
+		PayPalPlanMax:          getEnv("PAYPAL_PLAN_MAX", ""),
 	}
 
 	return cfg

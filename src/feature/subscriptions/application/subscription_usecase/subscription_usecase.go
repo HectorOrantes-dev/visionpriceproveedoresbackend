@@ -84,14 +84,17 @@ func (uc *SubscriptionUseCase) ProductLimit(ctx context.Context, providerID stri
 	sub, err := uc.repo.GetByProvider(ctx, pid)
 	if err != nil {
 		// No subscription yet: fall back to the free plan limit (fail closed).
-		freePlan, planErr := uc.repo.GetPlan(ctx, defaultPlanCode)
-		if planErr != nil || freePlan.ProductLimit == nil {
-			return 0, false, domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al determinar el límite del plan")
-		}
-		return *freePlan.ProductLimit, false, nil
+		return uc.freePlanLimit(ctx)
 	}
 
-	plan, err := uc.repo.GetPlan(ctx, sub.PlanCode)
+	// Only an active subscription grants its plan's limit. A canceled or past_due
+	// account reverts to the free tier's cap until it pays again.
+	planCode := sub.PlanCode
+	if sub.Status != "active" {
+		return uc.freePlanLimit(ctx)
+	}
+
+	plan, err := uc.repo.GetPlan(ctx, planCode)
 	if err != nil {
 		return 0, false, domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al obtener el plan")
 	}
@@ -99,6 +102,15 @@ func (uc *SubscriptionUseCase) ProductLimit(ctx context.Context, providerID stri
 		return 0, true, nil
 	}
 	return *plan.ProductLimit, false, nil
+}
+
+// freePlanLimit returns the free plan's product cap (fail-closed default).
+func (uc *SubscriptionUseCase) freePlanLimit(ctx context.Context) (int, bool, error) {
+	freePlan, err := uc.repo.GetPlan(ctx, defaultPlanCode)
+	if err != nil || freePlan.ProductLimit == nil {
+		return 0, false, domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al determinar el límite del plan")
+	}
+	return *freePlan.ProductLimit, false, nil
 }
 
 // EnsureDefault creates the default free subscription for a provider if missing.
@@ -111,4 +123,15 @@ func (uc *SubscriptionUseCase) EnsureDefault(ctx context.Context, providerID uui
 // It implements the SubscriptionUpdater port consumed by the payments feature.
 func (uc *SubscriptionUseCase) ApplyWebhook(ctx context.Context, update entities.WebhookUpdate) error {
 	return uc.repo.UpsertFromWebhook(ctx, update)
+}
+
+// ResolveProviderByExternalSubscription maps a gateway subscription id to a
+// provider id. It implements part of the SubscriptionUpdater port (used for
+// Conekta webhooks, which don't carry our provider id).
+func (uc *SubscriptionUseCase) ResolveProviderByExternalSubscription(ctx context.Context, externalSubscriptionID string) (string, error) {
+	pid, err := uc.repo.FindProviderByExternalSubscription(ctx, externalSubscriptionID)
+	if err != nil {
+		return "", err
+	}
+	return pid.String(), nil
 }

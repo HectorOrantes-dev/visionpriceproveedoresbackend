@@ -102,18 +102,20 @@ func (r *SupabaseSubscriptionRepository) CountActiveProducts(ctx context.Context
 
 // UpsertFromWebhook applies a normalized webhook update to the subscription.
 func (r *SupabaseSubscriptionRepository) UpsertFromWebhook(ctx context.Context, in entities.WebhookUpdate) error {
+	// COALESCE/NULLIF keep existing values when a webhook omits a field (e.g. a
+	// cancellation event may not resend the plan): only non-empty values overwrite.
 	const q = `
 		INSERT INTO provider_subscriptions
 			(provider_id, plan_code, status, payment_provider,
 			 external_customer_id, external_subscription_id, current_period_end, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+		VALUES ($1, COALESCE(NULLIF($2,''), 'free'), $3, $4, $5, $6, $7, NOW())
 		ON CONFLICT (provider_id) DO UPDATE SET
-			plan_code = EXCLUDED.plan_code,
+			plan_code = COALESCE(NULLIF(EXCLUDED.plan_code, ''), provider_subscriptions.plan_code),
 			status = EXCLUDED.status,
-			payment_provider = EXCLUDED.payment_provider,
-			external_customer_id = EXCLUDED.external_customer_id,
-			external_subscription_id = EXCLUDED.external_subscription_id,
-			current_period_end = EXCLUDED.current_period_end,
+			payment_provider = COALESCE(EXCLUDED.payment_provider, provider_subscriptions.payment_provider),
+			external_customer_id = COALESCE(EXCLUDED.external_customer_id, provider_subscriptions.external_customer_id),
+			external_subscription_id = COALESCE(EXCLUDED.external_subscription_id, provider_subscriptions.external_subscription_id),
+			current_period_end = COALESCE(EXCLUDED.current_period_end, provider_subscriptions.current_period_end),
 			updated_at = NOW()
 	`
 	_, err := r.db.Exec(ctx, q,
@@ -126,6 +128,16 @@ func (r *SupabaseSubscriptionRepository) UpsertFromWebhook(ctx context.Context, 
 		in.CurrentPeriodEnd,
 	)
 	return err
+}
+
+// FindProviderByExternalSubscription returns the provider bound to a gateway subscription id.
+func (r *SupabaseSubscriptionRepository) FindProviderByExternalSubscription(ctx context.Context, externalSubscriptionID string) (uuid.UUID, error) {
+	const q = `SELECT provider_id FROM provider_subscriptions WHERE external_subscription_id = $1`
+	var pid uuid.UUID
+	if err := r.db.QueryRow(ctx, q, externalSubscriptionID).Scan(&pid); err != nil {
+		return uuid.Nil, fmt.Errorf("provider not found for subscription %s: %w", externalSubscriptionID, err)
+	}
+	return pid, nil
 }
 
 // scanPlan scans one plan row, decoding the features JSONB column.

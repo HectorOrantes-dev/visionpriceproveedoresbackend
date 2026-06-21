@@ -57,7 +57,7 @@ func (ctrl *PaymentController) CreateCheckout(c *gin.Context) {
 		return
 	}
 
-	out, err := ctrl.useCase.CreateCheckout(c.Request.Context(), providerID.(string), req.PlanCode, req.Gateway)
+	out, err := ctrl.useCase.CreateCheckout(c.Request.Context(), providerID.(string), req.PlanCode, req.Gateway, req.PaymentToken)
 	if err != nil {
 		handlePaymentError(c, err)
 		return

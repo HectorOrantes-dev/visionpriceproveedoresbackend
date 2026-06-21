@@ -36,4 +36,15 @@ type EventStore interface {
 // the subscriptions use case.
 type SubscriptionUpdater interface {
 	ApplyWebhook(ctx context.Context, update subscriptionEntities.WebhookUpdate) error
+
+	// ResolveProviderByExternalSubscription maps a gateway subscription id back to
+	// the VisionPrice provider id. Needed for Conekta, whose webhook payloads
+	// don't carry our provider id (PayPal does, via custom_id).
+	ResolveProviderByExternalSubscription(ctx context.Context, externalSubscriptionID string) (string, error)
+}
+
+// ProviderDirectory is the narrow port used to fetch the contact data required
+// to create a customer at the payment gateway (Conekta needs name + email).
+type ProviderDirectory interface {
+	GetProviderContact(ctx context.Context, providerID string) (name, email string, err error)
 }
