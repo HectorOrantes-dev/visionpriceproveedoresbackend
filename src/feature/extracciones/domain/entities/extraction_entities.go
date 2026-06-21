@@ -33,6 +33,9 @@ type ImportSummary struct {
 	NewProducts     int           `json:"new_products"`
 	UpdatedProducts int           `json:"updated_products"`
 	SkippedRows     int           `json:"skipped_rows"`
+	SkippedByLimit  int           `json:"skipped_by_limit"`
+	LimitReached    bool          `json:"limit_reached"`
+	LimitMessage    string        `json:"limit_message,omitempty"`
 	Errors          []ImportError `json:"errors"`
 }
 

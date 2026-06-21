@@ -11,17 +11,22 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/visionprice/proveedores-backend/src/core/config"
+	"github.com/visionprice/proveedores-backend/src/core/csrf"
 	"github.com/visionprice/proveedores-backend/src/core/database"
 	"github.com/visionprice/proveedores-backend/src/core/middleware"
+	"github.com/visionprice/proveedores-backend/src/core/validation"
 
 	dependencies2FA "github.com/visionprice/proveedores-backend/src/feature/2FA/infraestructure/dependencies_2FA"
 	dependenciesAdmin "github.com/visionprice/proveedores-backend/src/feature/admin/infraestructure/dependencies_admin"
 	dependenciesExtracciones "github.com/visionprice/proveedores-backend/src/feature/extracciones/infraestructure/dependencies_extracciones"
 	dependenciesGeolocations "github.com/visionprice/proveedores-backend/src/feature/geolocations/infraestructure/dependencies_geolocations"
 	dependenciesLogin "github.com/visionprice/proveedores-backend/src/feature/login/infraestructure/dependencies_login"
+	dependenciesML "github.com/visionprice/proveedores-backend/src/feature/ml/infraestructure/dependencies_ml"
+	paymentAdapters "github.com/visionprice/proveedores-backend/src/feature/payments/infraestructure/adapters"
+	dependenciesPayments "github.com/visionprice/proveedores-backend/src/feature/payments/infraestructure/dependencies_payments"
 	dependenciesProducts "github.com/visionprice/proveedores-backend/src/feature/products/infraestructure/dependencies_products"
 	dependenciesRegister "github.com/visionprice/proveedores-backend/src/feature/register/infraestructure/dependencies_register"
-	dependenciesML "github.com/visionprice/proveedores-backend/src/feature/ml/infraestructure/dependencies_ml"
+	dependenciesSubscriptions "github.com/visionprice/proveedores-backend/src/feature/subscriptions/infraestructure/dependencies_subscriptions"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -56,16 +61,27 @@ func main() {
 	dbPool := database.NewPool(ctx, cfg.DatabaseURL)
 	defer dbPool.Close()
 
+	// Register custom request validators (backend anti-XSS, etc.)
+	if err := validation.RegisterCustomValidators(); err != nil {
+		log.Fatalf("FATAL: failed to register custom validators: %v", err)
+	}
+
 	// Initialize rate limiter (DB-backed)
 	rateLimiter := middleware.NewRateLimiter(dbPool)
 
-	// Start background cleanup of old rate limit entries (every 10 minutes)
+	// Initialize CSRF manager. Tokens live as long as the session (refresh token).
+	csrfManager := csrf.NewManager(dbPool, time.Duration(cfg.RefreshTokenExpirationHours)*time.Hour)
+
+	// Start background cleanup of old rate limit + CSRF entries (every 10 minutes)
 	go func() {
 		ticker := time.NewTicker(10 * time.Minute)
 		defer ticker.Stop()
 		for range ticker.C {
 			if err := rateLimiter.CleanupOldAttempts(context.Background()); err != nil {
 				log.Printf("WARNING: rate limiter cleanup failed: %v", err)
+			}
+			if err := csrfManager.CleanupExpired(context.Background()); err != nil {
+				log.Printf("WARNING: CSRF token cleanup failed: %v", err)
 			}
 		}
 	}()
@@ -93,14 +109,35 @@ func main() {
 	v1 := router.Group("/api/v1")
 
 	// Initialize features
-	dependenciesRegister.Init(v1, dbPool, rateLimiter)
+	// Subscriptions first: its use case is the PlanLimitService / DefaultSubscriptionCreator /
+	// SubscriptionUpdater consumed by products, extracciones, register, and payments.
+	subscriptionUseCase := dependenciesSubscriptions.Init(v1, dbPool, cfg.JWTSecret)
+
+	dependenciesRegister.Init(v1, dbPool, subscriptionUseCase, rateLimiter)
 	dependenciesLogin.Init(v1, dbPool, cfg.JWTSecret, cfg.JWTExpirationMinutes, cfg.OTPExpirationMinutes, cfg.PasswordResetExpirationMinutes, rateLimiter)
-	dependencies2FA.Init(v1, dbPool, cfg.JWTSecret, cfg.OTPExpirationMinutes, cfg.JWTExpirationMinutes, cfg.RefreshTokenExpirationHours, rateLimiter)
+	dependencies2FA.Init(v1, dbPool, csrfManager, cfg.JWTSecret, cfg.OTPExpirationMinutes, cfg.JWTExpirationMinutes, cfg.RefreshTokenExpirationHours, rateLimiter)
 	dependenciesGeolocations.Init(v1, dbPool, cfg.JWTSecret)
-	dependenciesProducts.Init(v1, dbPool, cfg.JWTSecret)
-	dependenciesExtracciones.Init(v1, dbPool, cfg.JWTSecret)
+	dependenciesProducts.Init(v1, dbPool, csrfManager, subscriptionUseCase, cfg.JWTSecret)
+	dependenciesExtracciones.Init(v1, dbPool, subscriptionUseCase, cfg.JWTSecret)
 	dependenciesAdmin.Init(v1, dbPool, cfg.JWTSecret, cfg.JWTExpirationMinutes, rateLimiter)
 	dependenciesML.Init(v1, dbPool, cfg.JWTSecret)
+
+	dependenciesPayments.Init(v1, dbPool, csrfManager, subscriptionUseCase, dependenciesPayments.Config{
+		Enabled:        cfg.PaymentsEnabled,
+		DefaultGateway: cfg.PaymentDefaultGateway,
+		SuccessURL:     cfg.SubscriptionSuccessURL,
+		CancelURL:      cfg.SubscriptionCancelURL,
+		Conekta: paymentAdapters.ConektaConfig{
+			PrivateKey:    cfg.ConektaPrivateKey,
+			WebhookSecret: cfg.ConektaWebhookSecret,
+		},
+		PayPal: paymentAdapters.PayPalConfig{
+			ClientID:     cfg.PayPalClientID,
+			ClientSecret: cfg.PayPalClientSecret,
+			WebhookID:    cfg.PayPalWebhookID,
+			Env:          cfg.PayPalEnv,
+		},
+	}, cfg.JWTSecret)
 
 	// Swagger documentation (only enabled when ENABLE_SWAGGER=true)
 	if cfg.EnableSwagger {

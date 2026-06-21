@@ -2,6 +2,7 @@ package register_usecase
 
 import (
 	"context"
+	"log"
 	"strings"
 
 	"golang.org/x/crypto/bcrypt"
@@ -13,12 +14,13 @@ import (
 
 // RegisterUseCase contains the business logic for provider registration.
 type RegisterUseCase struct {
-	repo domain.RegisterRepository
+	repo          domain.RegisterRepository
+	subscriptions domain.DefaultSubscriptionCreator
 }
 
 // NewRegisterUseCase creates a new RegisterUseCase with the given repository.
-func NewRegisterUseCase(repo domain.RegisterRepository) *RegisterUseCase {
-	return &RegisterUseCase{repo: repo}
+func NewRegisterUseCase(repo domain.RegisterRepository, subscriptions domain.DefaultSubscriptionCreator) *RegisterUseCase {
+	return &RegisterUseCase{repo: repo, subscriptions: subscriptions}
 }
 
 // Execute registers a new provider after validating uniqueness and hashing the password.
@@ -62,6 +64,12 @@ func (uc *RegisterUseCase) Execute(ctx context.Context, req *entities.RegisterRe
 	created, err := uc.repo.CreateProvider(ctx, provider)
 	if err != nil {
 		return nil, domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al registrar el proveedor")
+	}
+
+	// Assign the default free subscription (Plan Gratuito, never expires).
+	// A failure here is non-fatal: GetCurrent/ProductLimit self-heal the row later.
+	if err := uc.subscriptions.EnsureDefault(ctx, created.ID); err != nil {
+		log.Printf("WARNING: could not create default subscription for provider %s: %v", created.ID, err)
 	}
 
 	return &entities.RegisterResponse{

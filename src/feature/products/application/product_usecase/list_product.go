@@ -26,8 +26,11 @@ func (uc *ProductUseCase) GetProduct(ctx context.Context, providerID string, pro
 		return nil, domainErrors.NewDomainError(domainErrors.ErrNotFound, "Producto no encontrado")
 	}
 
+	// IDOR defense: the owner is taken from the session (pid), never from the URL.
+	// If the resource exists but does not belong to the caller, respond as if it
+	// did not exist (404) so an attacker cannot probe for valid IDs of other users.
 	if product.ProviderID != pid {
-		return nil, domainErrors.NewDomainError(domainErrors.ErrUnauthorized, "No tiene permisos para ver este producto")
+		return nil, domainErrors.NewDomainError(domainErrors.ErrNotFound, "Producto no encontrado")
 	}
 
 	return product, nil

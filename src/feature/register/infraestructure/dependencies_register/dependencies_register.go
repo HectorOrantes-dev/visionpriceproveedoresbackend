@@ -8,18 +8,19 @@ import (
 
 	"github.com/visionprice/proveedores-backend/src/core/middleware"
 	"github.com/visionprice/proveedores-backend/src/feature/register/application/register_usecase"
+	registerDomain "github.com/visionprice/proveedores-backend/src/feature/register/domain"
 	"github.com/visionprice/proveedores-backend/src/feature/register/infraestructure/adapters"
 	"github.com/visionprice/proveedores-backend/src/feature/register/infraestructure/controllers"
 	"github.com/visionprice/proveedores-backend/src/feature/register/infraestructure/routers"
 )
 
 // Init wires all dependencies for the register feature and registers routes.
-func Init(router *gin.RouterGroup, db *pgxpool.Pool, rateLimiter *middleware.RateLimiter) {
+func Init(router *gin.RouterGroup, db *pgxpool.Pool, subscriptions registerDomain.DefaultSubscriptionCreator, rateLimiter *middleware.RateLimiter) {
 	// Repository (adapter)
 	repo := adapters.NewSupabaseRegisterRepository(db)
 
 	// Use case
-	useCase := register_usecase.NewRegisterUseCase(repo)
+	useCase := register_usecase.NewRegisterUseCase(repo, subscriptions)
 
 	// Controller
 	controller := controllers.NewRegisterController(useCase)

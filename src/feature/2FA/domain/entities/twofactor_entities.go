@@ -22,7 +22,10 @@ type VerifyOTPRequest struct {
 }
 
 // VerifyOTPResponse is returned after successful OTP verification.
+// CSRFToken must be sent back by the client in the X-CSRF-Token header on every
+// state-changing request.
 type VerifyOTPResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
+	CSRFToken    string `json:"csrf_token"`
 }

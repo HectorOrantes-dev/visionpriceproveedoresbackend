@@ -17,4 +17,9 @@ type AdminRepository interface {
 
 	// FindSystemUserByEmail retrieves a system admin user by email for authentication.
 	FindSystemUserByEmail(ctx context.Context, email string) (*entities.SystemUser, error)
+
+	// GetExpiringSubscriptions retrieves paid subscriptions whose current period
+	// ends within the next `withinDays` days (includes already-overdue ones),
+	// joined with the provider and plan info. Free plans (no expiry) are excluded.
+	GetExpiringSubscriptions(ctx context.Context, withinDays int) ([]*entities.ExpiringSubscription, error)
 }

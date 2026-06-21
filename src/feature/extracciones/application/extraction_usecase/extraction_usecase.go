@@ -21,12 +21,13 @@ const maxRows = 1000
 
 // ExtractionUseCase contains business logic for Excel import operations.
 type ExtractionUseCase struct {
-	repo domain.ExtractionRepository
+	repo      domain.ExtractionRepository
+	planLimit domain.PlanLimitService
 }
 
 // NewExtractionUseCase creates a new ExtractionUseCase.
-func NewExtractionUseCase(repo domain.ExtractionRepository) *ExtractionUseCase {
-	return &ExtractionUseCase{repo: repo}
+func NewExtractionUseCase(repo domain.ExtractionRepository, planLimit domain.PlanLimitService) *ExtractionUseCase {
+	return &ExtractionUseCase{repo: repo, planLimit: planLimit}
 }
 
 // DetectColumns reads the headers from an uploaded Excel file and returns the column names.
@@ -174,10 +175,29 @@ func (uc *ExtractionUseCase) ProcessImport(ctx context.Context, providerID strin
 		}
 	}
 
+	// Determine the remaining capacity under the provider's plan. New inserts are
+	// capped at `remaining`; updates to existing products don't count. A negative
+	// value means unlimited (Plan Max).
+	remaining := -1
+	limit, unlimited, err := uc.planLimit.ProductLimit(ctx, providerID)
+	if err != nil {
+		return nil, domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al verificar el límite del plan")
+	}
+	if !unlimited {
+		currentCount, err := uc.repo.CountActiveProducts(ctx, pid)
+		if err != nil {
+			return nil, domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al verificar el inventario actual")
+		}
+		remaining = limit - currentCount
+		if remaining < 0 {
+			remaining = 0
+		}
+	}
+
 	// Bulk upsert valid products
-	newCount, updatedCount := 0, 0
+	newCount, updatedCount, skippedByLimit := 0, 0, 0
 	if len(products) > 0 {
-		newCount, updatedCount, err = uc.repo.BulkUpsertProducts(ctx, pid, products)
+		newCount, updatedCount, skippedByLimit, err = uc.repo.BulkUpsertProducts(ctx, pid, products, remaining)
 		if err != nil {
 			return nil, domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al importar productos")
 		}
@@ -187,8 +207,15 @@ func (uc *ExtractionUseCase) ProcessImport(ctx context.Context, providerID strin
 		TotalRows:       len(dataRows),
 		NewProducts:     newCount,
 		UpdatedProducts: updatedCount,
-		SkippedRows:     len(dataRows) - len(products),
+		SkippedRows:     (len(dataRows) - len(products)) + skippedByLimit,
+		SkippedByLimit:  skippedByLimit,
+		LimitReached:    skippedByLimit > 0,
 		Errors:          importErrors,
+	}
+	if skippedByLimit > 0 {
+		summary.LimitMessage = fmt.Sprintf(
+			"Se omitieron %d productos por alcanzar el límite de tu plan (%d). Sube de plan para cargar más.",
+			skippedByLimit, limit)
 	}
 
 	if summary.Errors == nil {

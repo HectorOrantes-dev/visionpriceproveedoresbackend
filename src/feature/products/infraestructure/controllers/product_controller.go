@@ -229,6 +229,9 @@ func handleProductError(c *gin.Context, err error) {
 		case errors.Is(domainErr.Base, domainErrors.ErrUnauthorized):
 			responses.ErrorResponse(c, http.StatusForbidden, domainErr.Message, nil)
 			return
+		case errors.Is(domainErr.Base, domainErrors.ErrPaymentRequired):
+			responses.ErrorResponse(c, http.StatusPaymentRequired, domainErr.Message, nil)
+			return
 		}
 	}
 	responses.ErrorResponse(c, http.StatusInternalServerError, "Error interno del servidor", nil)

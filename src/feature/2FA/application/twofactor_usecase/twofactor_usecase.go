@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/visionprice/proveedores-backend/src/core/csrf"
 	domainErrors "github.com/visionprice/proveedores-backend/src/core/errors"
 	"github.com/visionprice/proveedores-backend/src/core/middleware"
 	"github.com/visionprice/proveedores-backend/src/feature/2FA/domain"
@@ -18,6 +19,7 @@ import (
 // TwoFactorUseCase contains business logic for 2FA OTP.
 type TwoFactorUseCase struct {
 	repo                        domain.TwoFactorRepository
+	csrfManager                 *csrf.Manager
 	jwtSecret                   string
 	otpExpirationMinutes        int
 	jwtExpirationMinutes        int
@@ -27,6 +29,7 @@ type TwoFactorUseCase struct {
 // NewTwoFactorUseCase creates a new TwoFactorUseCase.
 func NewTwoFactorUseCase(
 	repo domain.TwoFactorRepository,
+	csrfManager *csrf.Manager,
 	jwtSecret string,
 	otpExpirationMinutes int,
 	jwtExpirationMinutes int,
@@ -34,6 +37,7 @@ func NewTwoFactorUseCase(
 ) *TwoFactorUseCase {
 	return &TwoFactorUseCase{
 		repo:                        repo,
+		csrfManager:                 csrfManager,
 		jwtSecret:                   jwtSecret,
 		otpExpirationMinutes:        otpExpirationMinutes,
 		jwtExpirationMinutes:        jwtExpirationMinutes,
@@ -63,41 +67,48 @@ func (uc *TwoFactorUseCase) GenerateOTP(ctx context.Context, providerID string) 
 	return nil
 }
 
-// VerifyOTP validates the OTP code and returns a full JWT token pair.
-func (uc *TwoFactorUseCase) VerifyOTP(ctx context.Context, providerID string, code string) (string, string, error) {
+// VerifyOTP validates the OTP code and returns a full JWT token pair plus a
+// per-session CSRF token bound to the provider.
+func (uc *TwoFactorUseCase) VerifyOTP(ctx context.Context, providerID string, code string) (accessToken, refreshToken, csrfToken string, err error) {
 	pid, err := uuid.Parse(providerID)
 	if err != nil {
-		return "", "", domainErrors.NewDomainError(domainErrors.ErrValidation, "ID de proveedor inválido")
+		return "", "", "", domainErrors.NewDomainError(domainErrors.ErrValidation, "ID de proveedor inválido")
 	}
 
 	valid, err := uc.repo.ValidateOTP(ctx, pid, code)
 	if err != nil || !valid {
-		return "", "", domainErrors.NewDomainError(domainErrors.ErrUnauthorized, "Código OTP inválido o expirado")
+		return "", "", "", domainErrors.NewDomainError(domainErrors.ErrUnauthorized, "Código OTP inválido o expirado")
 	}
 
 	// Generate full access token
-	accessToken, err := middleware.GenerateToken(
+	accessToken, err = middleware.GenerateToken(
 		providerID,
 		middleware.TokenTypeAccess,
 		uc.jwtSecret,
 		time.Duration(uc.jwtExpirationMinutes)*time.Minute,
 	)
 	if err != nil {
-		return "", "", domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al generar token de acceso")
+		return "", "", "", domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al generar token de acceso")
 	}
 
 	// Generate refresh token
-	refreshToken, err := middleware.GenerateToken(
+	refreshToken, err = middleware.GenerateToken(
 		providerID,
 		middleware.TokenTypeRefresh,
 		uc.jwtSecret,
 		time.Duration(uc.refreshTokenExpirationHours)*time.Hour,
 	)
 	if err != nil {
-		return "", "", domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al generar refresh token")
+		return "", "", "", domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al generar refresh token")
 	}
 
-	return accessToken, refreshToken, nil
+	// Issue a per-session CSRF token bound to this provider.
+	csrfToken, err = uc.csrfManager.Issue(ctx, providerID)
+	if err != nil {
+		return "", "", "", domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al generar token CSRF")
+	}
+
+	return accessToken, refreshToken, csrfToken, nil
 }
 
 // generateSecureOTP generates a cryptographically secure N-digit numeric code.

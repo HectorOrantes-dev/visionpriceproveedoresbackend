@@ -6,10 +6,11 @@ import (
 
 // ProductUseCase contains business logic for product operations.
 type ProductUseCase struct {
-	repo domain.ProductRepository
+	repo      domain.ProductRepository
+	planLimit domain.PlanLimitService
 }
 
 // NewProductUseCase creates a new ProductUseCase.
-func NewProductUseCase(repo domain.ProductRepository) *ProductUseCase {
-	return &ProductUseCase{repo: repo}
+func NewProductUseCase(repo domain.ProductRepository, planLimit domain.PlanLimitService) *ProductUseCase {
+	return &ProductUseCase{repo: repo, planLimit: planLimit}
 }

@@ -18,12 +18,14 @@ type Provider struct {
 }
 
 // RegisterRequest is the DTO for provider registration.
+// Free-text fields carry "nohtml" as a backend anti-XSS defense; RFC is further
+// constrained to its alphanumeric format so no markup can enter through it.
 type RegisterRequest struct {
-	BusinessName string `json:"business_name" binding:"required,min=2,max=255"`
-	RFC          string `json:"rfc" binding:"required,min=12,max=13"`
+	BusinessName string `json:"business_name" binding:"required,min=2,max=255,nohtml"`
+	RFC          string `json:"rfc" binding:"required,min=12,max=13,alphanum"`
 	Email        string `json:"email" binding:"required,email"`
-	Phone        string `json:"phone" binding:"required,min=10,max=20"`
-	Password     string `json:"password" binding:"required,min=8"`
+	Phone        string `json:"phone" binding:"required,min=10,max=20,nohtml"`
+	Password     string `json:"password" binding:"required,min=8,max=72"`
 }
 
 // RegisterResponse is the DTO returned after successful registration.

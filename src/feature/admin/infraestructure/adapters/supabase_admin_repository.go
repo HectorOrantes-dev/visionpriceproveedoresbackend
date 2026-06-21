@@ -3,6 +3,7 @@ package adapters
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -87,6 +88,49 @@ func (r *SupabaseAdminRepository) GetProviderMapPins(ctx context.Context) ([]*en
 	}
 
 	return pins, nil
+}
+
+// GetExpiringSubscriptions retrieves paid subscriptions expiring within withinDays
+// (including overdue ones), joined with provider and plan data. Free plans have a
+// NULL current_period_end and are naturally excluded.
+func (r *SupabaseAdminRepository) GetExpiringSubscriptions(ctx context.Context, withinDays int) ([]*entities.ExpiringSubscription, error) {
+	const query = `
+		SELECT ps.provider_id, p.business_name, p.email,
+		       ps.plan_code, sp.name, ps.status, ps.current_period_end
+		FROM provider_subscriptions ps
+		JOIN providers p ON p.id = ps.provider_id
+		JOIN subscription_plans sp ON sp.code = ps.plan_code
+		WHERE ps.current_period_end IS NOT NULL
+		  AND ps.status <> 'canceled'
+		  AND ps.current_period_end <= NOW() + make_interval(days => $1)
+		ORDER BY ps.current_period_end ASC
+	`
+
+	rows, err := r.db.Query(ctx, query, withinDays)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query expiring subscriptions: %w", err)
+	}
+	defer rows.Close()
+
+	items := []*entities.ExpiringSubscription{}
+	for rows.Next() {
+		item := &entities.ExpiringSubscription{}
+		if err := rows.Scan(
+			&item.ProviderID,
+			&item.BusinessName,
+			&item.Email,
+			&item.PlanCode,
+			&item.PlanName,
+			&item.Status,
+			&item.CurrentPeriodEnd,
+		); err != nil {
+			return nil, fmt.Errorf("failed to scan expiring subscription: %w", err)
+		}
+		item.DaysUntilExpiry = int(time.Until(item.CurrentPeriodEnd).Hours() / 24)
+		items = append(items, item)
+	}
+
+	return items, rows.Err()
 }
 
 // FindSystemUserByEmail retrieves a system admin user by email for authentication.

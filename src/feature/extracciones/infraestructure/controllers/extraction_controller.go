@@ -193,6 +193,9 @@ func handleExtractionError(c *gin.Context, err error) {
 		case errors.Is(domainErr.Base, domainErrors.ErrValidation):
 			responses.ErrorResponse(c, http.StatusBadRequest, domainErr.Message, nil)
 			return
+		case errors.Is(domainErr.Base, domainErrors.ErrPaymentRequired):
+			responses.ErrorResponse(c, http.StatusPaymentRequired, domainErr.Message, nil)
+			return
 		}
 	}
 	responses.ErrorResponse(c, http.StatusInternalServerError, "Error interno del servidor", nil)

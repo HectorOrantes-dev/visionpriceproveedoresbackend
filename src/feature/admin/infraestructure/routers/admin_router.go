@@ -22,6 +22,7 @@ func SetupAdminRoutes(router *gin.RouterGroup, controller *controllers.AdminCont
 		{
 			protected.GET("/metrics", controller.GetMetrics)
 			protected.GET("/geography/providers", controller.GetProviderMapPins)
+			protected.GET("/subscriptions/expiring", controller.GetExpiringSubscriptions)
 		}
 	}
 }

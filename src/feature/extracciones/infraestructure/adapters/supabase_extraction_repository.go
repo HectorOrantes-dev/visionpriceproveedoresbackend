@@ -89,16 +89,29 @@ func (r *SupabaseExtractionRepository) SaveMapping(ctx context.Context, mapping 
 	return result, nil
 }
 
+// CountActiveProducts returns the number of active products for a provider.
+func (r *SupabaseExtractionRepository) CountActiveProducts(ctx context.Context, providerID uuid.UUID) (int, error) {
+	const query = `SELECT COUNT(*) FROM products WHERE provider_id = $1 AND active = TRUE`
+	var count int
+	err := r.db.QueryRow(ctx, query, providerID).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("failed to count products: %w", err)
+	}
+	return count, nil
+}
+
 // BulkUpsertProducts inserts or updates products by name for a provider.
-func (r *SupabaseExtractionRepository) BulkUpsertProducts(ctx context.Context, providerID uuid.UUID, products []*productEntities.Product) (int, int, error) {
+// remaining caps NEW inserts (negative = unlimited); updates are always applied.
+func (r *SupabaseExtractionRepository) BulkUpsertProducts(ctx context.Context, providerID uuid.UUID, products []*productEntities.Product, remaining int) (int, int, int, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
-		return 0, 0, fmt.Errorf("failed to begin transaction: %w", err)
+		return 0, 0, 0, fmt.Errorf("failed to begin transaction: %w", err)
 	}
 	defer tx.Rollback(ctx)
 
 	newCount := 0
 	updatedCount := 0
+	skippedByLimit := 0
 
 	for _, product := range products {
 		// Check if product with same name exists for this provider
@@ -107,7 +120,11 @@ func (r *SupabaseExtractionRepository) BulkUpsertProducts(ctx context.Context, p
 		err := tx.QueryRow(ctx, checkQuery, providerID, product.Name).Scan(&existingID)
 
 		if err != nil {
-			// Product doesn't exist — insert
+			// Product doesn't exist — would be a NEW insert. Enforce the plan cap.
+			if remaining >= 0 && newCount >= remaining {
+				skippedByLimit++
+				continue
+			}
 			insertQuery := `
 				INSERT INTO products (provider_id, name, price, unit, category, description)
 				VALUES ($1, $2, $3, $4, $5, $6)
@@ -121,7 +138,7 @@ func (r *SupabaseExtractionRepository) BulkUpsertProducts(ctx context.Context, p
 				product.Description,
 			)
 			if err != nil {
-				return 0, 0, fmt.Errorf("failed to insert product '%s': %w", product.Name, err)
+				return 0, 0, 0, fmt.Errorf("failed to insert product '%s': %w", product.Name, err)
 			}
 			newCount++
 		} else {
@@ -139,15 +156,15 @@ func (r *SupabaseExtractionRepository) BulkUpsertProducts(ctx context.Context, p
 				existingID,
 			)
 			if err != nil {
-				return 0, 0, fmt.Errorf("failed to update product '%s': %w", product.Name, err)
+				return 0, 0, 0, fmt.Errorf("failed to update product '%s': %w", product.Name, err)
 			}
 			updatedCount++
 		}
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return 0, 0, fmt.Errorf("failed to commit transaction: %w", err)
+		return 0, 0, 0, fmt.Errorf("failed to commit transaction: %w", err)
 	}
 
-	return newCount, updatedCount, nil
+	return newCount, updatedCount, skippedByLimit, nil
 }

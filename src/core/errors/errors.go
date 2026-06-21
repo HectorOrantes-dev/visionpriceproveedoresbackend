@@ -4,13 +4,15 @@ import "errors"
 
 // Domain error types for consistent error handling across features.
 var (
-	ErrNotFound     = errors.New("resource not found")
-	ErrConflict     = errors.New("resource already exists")
-	ErrUnauthorized = errors.New("unauthorized access")
-	ErrValidation   = errors.New("validation error")
-	ErrInternal     = errors.New("internal server error")
-	ErrExpired      = errors.New("resource has expired")
-	ErrInvalidInput = errors.New("invalid input provided")
+	ErrNotFound        = errors.New("resource not found")
+	ErrConflict        = errors.New("resource already exists")
+	ErrUnauthorized    = errors.New("unauthorized access")
+	ErrValidation      = errors.New("validation error")
+	ErrInternal        = errors.New("internal server error")
+	ErrExpired         = errors.New("resource has expired")
+	ErrInvalidInput    = errors.New("invalid input provided")
+	ErrPaymentRequired = errors.New("payment required") // plan limit reached / upgrade needed (HTTP 402)
+	ErrNotImplemented  = errors.New("not implemented")  // feature scaffolded but not wired (HTTP 501)
 )
 
 // DomainError wraps a base error with a human-readable message.

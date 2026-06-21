@@ -2,12 +2,24 @@ package ml_usecase
 
 import (
 	"context"
+	"runtime"
+	"sync"
+	"sync/atomic"
 
 	"github.com/google/uuid"
 
 	domainErrors "github.com/visionprice/proveedores-backend/src/core/errors"
 	"github.com/visionprice/proveedores-backend/src/feature/ml/application/algorithms"
 	"github.com/visionprice/proveedores-backend/src/feature/ml/domain/entities"
+	productEntities "github.com/visionprice/proveedores-backend/src/feature/products/domain/entities"
+)
+
+const (
+	// similarityThreshold is the minimum cosine score to consider two items duplicates.
+	similarityThreshold = 0.85
+	// parallelMinProducts is the catalog size above which the O(N²) comparison is
+	// split across CPU cores. Below it, the goroutine overhead outweighs the gain.
+	parallelMinProducts = 200
 )
 
 // DetectDuplicates analyzes a provider's catalog to find items that might be the same product
@@ -29,27 +41,95 @@ func (uc *MLUseCase) DetectDuplicates(ctx context.Context, providerID uuid.UUID)
 		corpus = append(corpus, tokens)
 	}
 
-	// 2. Build TF-IDF vectors
+	// 2. Build TF-IDF vectors (sequential, O(N); shared read-only afterwards)
 	_, tfidfs := algorithms.BuildCorpusTFIDF(corpus)
 
-	// 3. Compare O(N^2 / 2) to find duplicates
-	var duplicates []*entities.DuplicatePair
-	const similarityThreshold = 0.85 // High confidence threshold
+	// 3. Compare all pairs O(N²/2). The work is pure CPU, so for large catalogs
+	//    we fan it out across cores; small catalogs stay sequential.
+	if len(products) < parallelMinProducts {
+		return detectDuplicatesSequential(products, tfidfs), nil
+	}
+	return detectDuplicatesParallel(ctx, products, tfidfs), nil
+}
 
-	for i := 0; i < len(products); i++ {
-		for j := i + 1; j < len(products); j++ {
-			score := algorithms.CosineSimilarity(tfidfs[i], tfidfs[j])
-			if score >= similarityThreshold {
-				duplicates = append(duplicates, &entities.DuplicatePair{
-					ProductID1:      products[i].ID,
-					ProductName1:    products[i].Name,
-					ProductID2:      products[j].ID,
-					ProductName2:    products[j].Name,
-					SimilarityScore: score,
-				})
+// detectDuplicatesSequential is the simple single-goroutine comparison.
+func detectDuplicatesSequential(products []*productEntities.Product, tfidfs []map[string]float64) []*entities.DuplicatePair {
+	duplicates := []*entities.DuplicatePair{}
+	n := len(products)
+	for i := 0; i < n; i++ {
+		for j := i + 1; j < n; j++ {
+			if pair := comparePair(products, tfidfs, i, j); pair != nil {
+				duplicates = append(duplicates, pair)
 			}
 		}
 	}
+	return duplicates
+}
 
-	return duplicates, nil
+// detectDuplicatesParallel splits the outer loop across worker goroutines.
+//
+// Safety: tfidfs and products are read-only here; each worker accumulates into
+// its own slice (results[workerID]) so there is no shared mutable state and no
+// mutex on the hot path. Rows are handed out via an atomic counter, which both
+// distributes work and balances load (early rows do more comparisons than late
+// ones, so contiguous splitting would be uneven).
+func detectDuplicatesParallel(ctx context.Context, products []*productEntities.Product, tfidfs []map[string]float64) []*entities.DuplicatePair {
+	n := len(products)
+
+	numWorkers := runtime.NumCPU()
+	if numWorkers > n {
+		numWorkers = n
+	}
+
+	var nextRow int64 = -1 // atomic.AddInt64 returns the post-increment value
+	results := make([][]*entities.DuplicatePair, numWorkers)
+
+	var wg sync.WaitGroup
+	for w := 0; w < numWorkers; w++ {
+		wg.Add(1)
+		go func(workerID int) {
+			defer wg.Done()
+			var local []*entities.DuplicatePair
+			// Publish this worker's results before wg.Done() (deferred LIFO order),
+			// regardless of which return path the loop takes.
+			defer func() { results[workerID] = local }()
+			for {
+				i := int(atomic.AddInt64(&nextRow, 1))
+				if i >= n {
+					return
+				}
+				// Respect request cancellation between rows.
+				if ctx.Err() != nil {
+					return
+				}
+				for j := i + 1; j < n; j++ {
+					if pair := comparePair(products, tfidfs, i, j); pair != nil {
+						local = append(local, pair)
+					}
+				}
+			}
+		}(w)
+	}
+	wg.Wait()
+
+	duplicates := []*entities.DuplicatePair{}
+	for _, r := range results {
+		duplicates = append(duplicates, r...)
+	}
+	return duplicates
+}
+
+// comparePair returns a DuplicatePair if products i and j are similar enough, else nil.
+func comparePair(products []*productEntities.Product, tfidfs []map[string]float64, i, j int) *entities.DuplicatePair {
+	score := algorithms.CosineSimilarity(tfidfs[i], tfidfs[j])
+	if score < similarityThreshold {
+		return nil
+	}
+	return &entities.DuplicatePair{
+		ProductID1:      products[i].ID,
+		ProductName1:    products[i].Name,
+		ProductID2:      products[j].ID,
+		ProductName2:    products[j].Name,
+		SimilarityScore: score,
+	}
 }

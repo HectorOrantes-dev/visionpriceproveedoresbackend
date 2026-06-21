@@ -24,4 +24,14 @@ type ProductRepository interface {
 
 	// SoftDelete marks a product as inactive (logical deletion).
 	SoftDelete(ctx context.Context, productID uuid.UUID) error
+
+	// CountActiveByProvider returns how many active products a provider has.
+	CountActiveByProvider(ctx context.Context, providerID uuid.UUID) (int, error)
+}
+
+// PlanLimitService is the narrow port (consumer-defined) the products feature
+// uses to learn the provider's product cap. Implemented by the subscriptions
+// use case. unlimited=true means there is no cap.
+type PlanLimitService interface {
+	ProductLimit(ctx context.Context, providerID string) (limit int, unlimited bool, err error)
 }

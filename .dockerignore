@@ -1,0 +1,29 @@
+# VCS / local
+.git
+.gitignore
+
+# Secrets — never bake into the image (set env vars in Railway instead)
+.env
+.env.*
+!example.env
+
+# Docs/markdown and editor/IDE files
+*.md
+.vscode
+.idea
+.claude
+
+# Local artifacts
+bin/
+build/
+dist/
+tmp/
+temp/
+uploads/
+logs/
+*.log
+
+# Test/sample data
+*.xlsx
+*.xls
+*.csv

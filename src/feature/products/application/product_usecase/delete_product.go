@@ -25,8 +25,10 @@ func (uc *ProductUseCase) DeleteProduct(ctx context.Context, providerID string, 
 		return domainErrors.NewDomainError(domainErrors.ErrNotFound, "Producto no encontrado")
 	}
 
+	// IDOR defense: ownership is checked against the session provider (pid).
+	// A non-owner gets a 404, identical to a non-existent product, to avoid leaking IDs.
 	if existing.ProviderID != pid {
-		return domainErrors.NewDomainError(domainErrors.ErrUnauthorized, "No tiene permisos para eliminar este producto")
+		return domainErrors.NewDomainError(domainErrors.ErrNotFound, "Producto no encontrado")
 	}
 
 	if err := uc.repo.SoftDelete(ctx, prodID); err != nil {

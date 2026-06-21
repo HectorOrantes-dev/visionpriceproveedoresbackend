@@ -164,6 +164,17 @@ func (r *SupabaseProductRepository) Update(ctx context.Context, product *entitie
 	return updated, nil
 }
 
+// CountActiveByProvider returns the number of active products for a provider.
+func (r *SupabaseProductRepository) CountActiveByProvider(ctx context.Context, providerID uuid.UUID) (int, error) {
+	const query = `SELECT COUNT(*) FROM products WHERE provider_id = $1 AND active = TRUE`
+	var count int
+	err := r.db.QueryRow(ctx, query, providerID).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("failed to count products: %w", err)
+	}
+	return count, nil
+}
+
 // SoftDelete marks a product as inactive.
 func (r *SupabaseProductRepository) SoftDelete(ctx context.Context, productID uuid.UUID) error {
 	query := `UPDATE products SET active = FALSE, updated_at = NOW() WHERE id = $1 AND active = TRUE`

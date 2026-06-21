@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -110,6 +111,39 @@ func (ctrl *AdminController) GetProviderMapPins(c *gin.Context) {
 	}
 
 	responses.SuccessResponse(c, http.StatusOK, "Pines de proveedores obtenidos exitosamente", result)
+}
+
+// GetExpiringSubscriptions godoc
+// @Summary      Listar suscripciones por vencer
+// @Description  Retorna las cuentas cuya suscripción de pago está por vencer (o vencida) dentro de N días, con su plan. Excluye el plan gratuito (no expira).
+// @Tags         Admin
+// @Produce      json
+// @Security     BearerAuth
+// @Param        days  query     int  false  "Ventana en días (default 7, máx 365)"
+// @Success      200   {object}  responses.APIResponse{data=[]entities.ExpiringSubscription}
+// @Failure      400   {object}  responses.APIResponse
+// @Failure      401   {object}  responses.APIResponse
+// @Failure      403   {object}  responses.APIResponse
+// @Failure      500   {object}  responses.APIResponse
+// @Router       /api/v1/admin/subscriptions/expiring [get]
+func (ctrl *AdminController) GetExpiringSubscriptions(c *gin.Context) {
+	withinDays := 0 // 0 → use case applies the default window
+	if d := c.Query("days"); d != "" {
+		parsed, err := strconv.Atoi(d)
+		if err != nil || parsed <= 0 {
+			responses.ErrorResponse(c, http.StatusBadRequest, "El parámetro 'days' debe ser un entero positivo", nil)
+			return
+		}
+		withinDays = parsed
+	}
+
+	result, err := ctrl.useCase.GetExpiringSubscriptions(c.Request.Context(), withinDays)
+	if err != nil {
+		handleAdminError(c, err)
+		return
+	}
+
+	responses.SuccessResponse(c, http.StatusOK, "Suscripciones por vencer obtenidas exitosamente", result)
 }
 
 func handleAdminError(c *gin.Context, err error) {

@@ -79,7 +79,7 @@ func (ctrl *TwoFactorController) VerifyOTP(c *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := ctrl.useCase.VerifyOTP(c.Request.Context(), providerID.(string), req.Code)
+	accessToken, refreshToken, csrfToken, err := ctrl.useCase.VerifyOTP(c.Request.Context(), providerID.(string), req.Code)
 	if err != nil {
 		var domainErr *domainErrors.DomainError
 		if errors.As(err, &domainErr) {
@@ -95,5 +95,6 @@ func (ctrl *TwoFactorController) VerifyOTP(c *gin.Context) {
 	responses.SuccessResponse(c, http.StatusOK, "Verificación 2FA exitosa", entities.VerifyOTPResponse{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
+		CSRFToken:    csrfToken,
 	})
 }

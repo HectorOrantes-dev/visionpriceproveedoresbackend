@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/visionprice/proveedores-backend/src/core/csrf"
 	"github.com/visionprice/proveedores-backend/src/core/middleware"
 	"github.com/visionprice/proveedores-backend/src/feature/2FA/application/twofactor_usecase"
 	"github.com/visionprice/proveedores-backend/src/feature/2FA/infraestructure/adapters"
@@ -14,12 +15,12 @@ import (
 )
 
 // Init wires all dependencies for the 2FA feature and registers routes.
-func Init(router *gin.RouterGroup, db *pgxpool.Pool, jwtSecret string, otpExpirationMinutes int, jwtExpirationMinutes int, refreshTokenExpirationHours int, rateLimiter *middleware.RateLimiter) {
+func Init(router *gin.RouterGroup, db *pgxpool.Pool, csrfManager *csrf.Manager, jwtSecret string, otpExpirationMinutes int, jwtExpirationMinutes int, refreshTokenExpirationHours int, rateLimiter *middleware.RateLimiter) {
 	// Repository
 	repo := adapters.NewSupabaseTwoFactorRepository(db)
 
 	// Use case
-	useCase := twofactor_usecase.NewTwoFactorUseCase(repo, jwtSecret, otpExpirationMinutes, jwtExpirationMinutes, refreshTokenExpirationHours)
+	useCase := twofactor_usecase.NewTwoFactorUseCase(repo, csrfManager, jwtSecret, otpExpirationMinutes, jwtExpirationMinutes, refreshTokenExpirationHours)
 
 	// Controller
 	controller := controllers.NewTwoFactorController(useCase)

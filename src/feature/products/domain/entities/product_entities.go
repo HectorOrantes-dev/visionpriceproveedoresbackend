@@ -21,21 +21,22 @@ type Product struct {
 }
 
 // CreateProductRequest is the DTO for creating a new product.
+// String fields carry the "nohtml" validator as a backend anti-XSS defense.
 type CreateProductRequest struct {
-	Name        string  `json:"name" binding:"required,min=1,max=255"`
+	Name        string  `json:"name" binding:"required,min=1,max=255,nohtml"`
 	Price       float64 `json:"price" binding:"required,gt=0"`
-	Unit        string  `json:"unit" binding:"required,min=1,max=50"`
-	Category    string  `json:"category" binding:"required,min=1,max=100"`
-	Description *string `json:"description,omitempty"`
+	Unit        string  `json:"unit" binding:"required,min=1,max=50,nohtml"`
+	Category    string  `json:"category" binding:"required,min=1,max=100,nohtml"`
+	Description *string `json:"description,omitempty" binding:"omitempty,max=2000,nohtml"`
 }
 
 // UpdateProductRequest is the DTO for updating a product.
 type UpdateProductRequest struct {
-	Name        *string  `json:"name,omitempty" binding:"omitempty,min=1,max=255"`
+	Name        *string  `json:"name,omitempty" binding:"omitempty,min=1,max=255,nohtml"`
 	Price       *float64 `json:"price,omitempty" binding:"omitempty,gt=0"`
-	Unit        *string  `json:"unit,omitempty" binding:"omitempty,min=1,max=50"`
-	Category    *string  `json:"category,omitempty" binding:"omitempty,min=1,max=100"`
-	Description *string  `json:"description,omitempty"`
+	Unit        *string  `json:"unit,omitempty" binding:"omitempty,min=1,max=50,nohtml"`
+	Category    *string  `json:"category,omitempty" binding:"omitempty,min=1,max=100,nohtml"`
+	Description *string  `json:"description,omitempty" binding:"omitempty,max=2000,nohtml"`
 }
 
 // MetricsSummary is the stub DTO for provider metrics (HU_PROV_05).

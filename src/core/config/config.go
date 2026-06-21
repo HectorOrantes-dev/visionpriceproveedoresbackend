@@ -21,6 +21,18 @@ type Config struct {
 	PasswordResetExpirationMinutes int
 	CORSAllowedOrigins             string
 	EnableSwagger                  bool
+
+	// Payments / billing
+	PaymentsEnabled        bool
+	PaymentDefaultGateway  string
+	SubscriptionSuccessURL string
+	SubscriptionCancelURL  string
+	ConektaPrivateKey      string
+	ConektaWebhookSecret   string
+	PayPalClientID         string
+	PayPalClientSecret     string
+	PayPalWebhookID        string
+	PayPalEnv              string
 }
 
 // Load reads environment variables from .env and returns a Config.
@@ -43,7 +55,7 @@ func Load() *Config {
 	}
 
 	cfg := &Config{
-		ServerPort:         getEnv("SERVER_PORT", "8080"),
+		ServerPort:         getServerPort(),
 		DatabaseURL:        getEnvRequired("DATABASE_URL"),
 		SupabaseURL:        getEnv("SUPABASE_URL", ""),
 		SupabaseKey:        getEnv("SUPABASE_KEY", ""),
@@ -55,9 +67,29 @@ func Load() *Config {
 		RefreshTokenExpirationHours:    getEnvAsInt("REFRESH_TOKEN_EXPIRATION_HOURS", 168),
 		OTPExpirationMinutes:           getEnvAsInt("OTP_EXPIRATION_MINUTES", 5),
 		PasswordResetExpirationMinutes: getEnvAsInt("PASSWORD_RESET_EXPIRATION_MINUTES", 15),
+
+		PaymentsEnabled:        getEnvAsBool("PAYMENTS_ENABLED", false),
+		PaymentDefaultGateway:  getEnv("PAYMENT_DEFAULT_GATEWAY", "conekta"),
+		SubscriptionSuccessURL: getEnv("SUBSCRIPTION_SUCCESS_URL", ""),
+		SubscriptionCancelURL:  getEnv("SUBSCRIPTION_CANCEL_URL", ""),
+		ConektaPrivateKey:      getEnv("CONEKTA_PRIVATE_KEY", ""),
+		ConektaWebhookSecret:   getEnv("CONEKTA_WEBHOOK_SECRET", ""),
+		PayPalClientID:         getEnv("PAYPAL_CLIENT_ID", ""),
+		PayPalClientSecret:     getEnv("PAYPAL_CLIENT_SECRET", ""),
+		PayPalWebhookID:        getEnv("PAYPAL_WEBHOOK_ID", ""),
+		PayPalEnv:              getEnv("PAYPAL_ENV", "sandbox"),
 	}
 
 	return cfg
+}
+
+// getServerPort resolves the port to listen on. Platforms like Railway/Heroku
+// inject PORT at runtime; it takes precedence over the app's own SERVER_PORT.
+func getServerPort() string {
+	if port := os.Getenv("PORT"); port != "" {
+		return port
+	}
+	return getEnv("SERVER_PORT", "8080")
 }
 
 func getEnv(key, fallback string) string {
@@ -100,4 +132,3 @@ func getEnvAsBool(key string, fallback bool) bool {
 	}
 	return value
 }
-

@@ -27,8 +27,10 @@ func (uc *ProductUseCase) UpdateProduct(ctx context.Context, providerID string, 
 		return nil, domainErrors.NewDomainError(domainErrors.ErrNotFound, "Producto no encontrado")
 	}
 
+	// IDOR defense: ownership is checked against the session provider (pid).
+	// A non-owner gets a 404, identical to a non-existent product, to avoid leaking IDs.
 	if existing.ProviderID != pid {
-		return nil, domainErrors.NewDomainError(domainErrors.ErrUnauthorized, "No tiene permisos para editar este producto")
+		return nil, domainErrors.NewDomainError(domainErrors.ErrNotFound, "Producto no encontrado")
 	}
 
 	// Apply updates
