@@ -116,12 +116,17 @@ func (g *ConektaGateway) VerifyWebhook(rawBody []byte, _ http.Header) (entities.
 			"Cuerpo del webhook de Conekta inválido")
 	}
 
-	// Connectivity check fired by the dashboard — just acknowledge it.
-	if head.Action == "webhook_ping" {
-		return entities.WebhookEvent{Provider: "conekta", Type: "webhook_ping", Ignored: true}, nil
+	// Acknowledge (200) anything that isn't a subscription lifecycle event WITHOUT
+	// calling the API: the connectivity ping ("webhook_ping"), the validation POST
+	// Conekta sends when a webhook is created (object "webhook", status
+	// "being_pinged", with no "type"), and webhook.*/payout.* meta events. None of
+	// these change subscription state, so no verification or private key is needed.
+	if head.Action == "webhook_ping" || !strings.HasPrefix(head.Type, "subscription.") {
+		return entities.WebhookEvent{Provider: "conekta", ExternalEventID: head.ID, Type: head.Type, Ignored: true}, nil
 	}
 
-	// Authenticity: re-fetch the event by id. A forged id won't exist for our key.
+	// subscription.* events change state: verify authenticity by re-fetching the
+	// event by id (a forged id won't exist for our private key), then map it.
 	var event struct {
 		ID   string `json:"id"`
 		Type string `json:"type"`
