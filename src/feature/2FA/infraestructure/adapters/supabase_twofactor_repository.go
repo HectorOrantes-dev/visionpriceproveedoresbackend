@@ -59,3 +59,13 @@ func (r *SupabaseTwoFactorRepository) InvalidateExpired(ctx context.Context) err
 	_, err := r.db.Exec(ctx, query)
 	return err
 }
+
+// GetProviderContact returns the provider's email and business name for OTP delivery.
+func (r *SupabaseTwoFactorRepository) GetProviderContact(ctx context.Context, providerID uuid.UUID) (string, string, error) {
+	query := `SELECT email, business_name FROM providers WHERE id = $1 AND active = TRUE`
+	var email, name string
+	if err := r.db.QueryRow(ctx, query, providerID).Scan(&email, &name); err != nil {
+		return "", "", fmt.Errorf("provider contact lookup failed: %w", err)
+	}
+	return email, name, nil
+}

@@ -16,4 +16,8 @@ type TwoFactorRepository interface {
 
 	// InvalidateExpired marks all expired OTP codes as used (cleanup).
 	InvalidateExpired(ctx context.Context) error
+
+	// GetProviderContact returns the email and display name of a provider, used
+	// to deliver the OTP.
+	GetProviderContact(ctx context.Context, providerID uuid.UUID) (email, name string, err error)
 }

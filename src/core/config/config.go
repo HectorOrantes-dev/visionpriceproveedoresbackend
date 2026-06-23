@@ -22,6 +22,14 @@ type Config struct {
 	CORSAllowedOrigins             string
 	EnableSwagger                  bool
 
+	// SMTP (OTP/2FA email delivery)
+	SMTPHost     string
+	SMTPPort     string
+	SMTPUsername string
+	SMTPPassword string
+	SMTPFrom     string
+	SMTPFromName string
+
 	// Payments / billing
 	PaymentsEnabled        bool
 	PaymentDefaultGateway  string
@@ -66,6 +74,13 @@ func Load() *Config {
 		JWTSecret:          jwtSecret,
 		CORSAllowedOrigins: corsOrigins,
 		EnableSwagger:      getEnvAsBool("ENABLE_SWAGGER", false),
+
+		SMTPHost:     getEnv("SMTP_HOST", ""),
+		SMTPPort:     getEnv("SMTP_PORT", "587"),
+		SMTPUsername: getEnv("SMTP_USERNAME", ""),
+		SMTPPassword: getEnv("SMTP_PASSWORD", ""),
+		SMTPFrom:     getEnv("SMTP_FROM", ""),
+		SMTPFromName: getEnv("SMTP_FROM_NAME", "VisionPriceProveedores"),
 
 		JWTExpirationMinutes:           getEnvAsInt("JWT_EXPIRATION_MINUTES", 15),
 		RefreshTokenExpirationHours:    getEnvAsInt("REFRESH_TOKEN_EXPIRATION_HOURS", 168),

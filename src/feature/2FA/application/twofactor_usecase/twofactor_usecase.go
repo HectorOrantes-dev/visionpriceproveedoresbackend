@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
-	"log"
 	"math/big"
 	"time"
 
@@ -19,6 +18,7 @@ import (
 // TwoFactorUseCase contains business logic for 2FA OTP.
 type TwoFactorUseCase struct {
 	repo                        domain.TwoFactorRepository
+	notifier                    domain.OTPNotifier
 	csrfManager                 *csrf.Manager
 	jwtSecret                   string
 	otpExpirationMinutes        int
@@ -29,6 +29,7 @@ type TwoFactorUseCase struct {
 // NewTwoFactorUseCase creates a new TwoFactorUseCase.
 func NewTwoFactorUseCase(
 	repo domain.TwoFactorRepository,
+	notifier domain.OTPNotifier,
 	csrfManager *csrf.Manager,
 	jwtSecret string,
 	otpExpirationMinutes int,
@@ -37,6 +38,7 @@ func NewTwoFactorUseCase(
 ) *TwoFactorUseCase {
 	return &TwoFactorUseCase{
 		repo:                        repo,
+		notifier:                    notifier,
 		csrfManager:                 csrfManager,
 		jwtSecret:                   jwtSecret,
 		otpExpirationMinutes:        otpExpirationMinutes,
@@ -45,7 +47,8 @@ func NewTwoFactorUseCase(
 	}
 }
 
-// GenerateOTP creates a 6-digit OTP, stores it, and logs it (stub email).
+// GenerateOTP creates a 6-digit OTP, stores it, and delivers it to the provider
+// via the configured notifier (email).
 func (uc *TwoFactorUseCase) GenerateOTP(ctx context.Context, providerID string) error {
 	pid, err := uuid.Parse(providerID)
 	if err != nil {
@@ -61,8 +64,14 @@ func (uc *TwoFactorUseCase) GenerateOTP(ctx context.Context, providerID string) 
 		return domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al almacenar código OTP")
 	}
 
-	// Stub: log the OTP code instead of sending via email/SMS
-	log.Printf("🔐 OTP CODE for provider %s: %s (expires in %d min)", providerID, code, uc.otpExpirationMinutes)
+	email, name, err := uc.repo.GetProviderContact(ctx, pid)
+	if err != nil {
+		return domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al obtener el correo del proveedor")
+	}
+
+	if err := uc.notifier.SendOTP(ctx, email, name, code, uc.otpExpirationMinutes); err != nil {
+		return domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al enviar el código OTP")
+	}
 
 	return nil
 }
