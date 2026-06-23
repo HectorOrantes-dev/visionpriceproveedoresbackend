@@ -17,16 +17,22 @@ import (
 )
 
 // Init wires all dependencies for the 2FA feature and registers routes.
-func Init(router *gin.RouterGroup, db *pgxpool.Pool, csrfManager *csrf.Manager, jwtSecret string, otpExpirationMinutes int, jwtExpirationMinutes int, refreshTokenExpirationHours int, smtp adapters.SMTPConfig, rateLimiter *middleware.RateLimiter) {
+func Init(router *gin.RouterGroup, db *pgxpool.Pool, csrfManager *csrf.Manager, jwtSecret string, otpExpirationMinutes int, jwtExpirationMinutes int, refreshTokenExpirationHours int, resend adapters.ResendConfig, smtp adapters.SMTPConfig, rateLimiter *middleware.RateLimiter) {
 	// Repository
 	repo := adapters.NewSupabaseTwoFactorRepository(db)
 
-	// OTP notifier: real SMTP when configured, log fallback otherwise (dev).
+	// OTP notifier selection by priority:
+	//   1. Resend (HTTP/443) — preferred; works where SMTP ports are blocked (Railway).
+	//   2. SMTP — when no Resend key but an SMTP host is configured.
+	//   3. Log fallback — neither configured (dev): the code is logged, not emailed.
 	var notifier domain.OTPNotifier
-	if smtp.Host != "" {
+	switch {
+	case resend.APIKey != "":
+		notifier = adapters.NewResendOTPNotifier(resend)
+	case smtp.Host != "":
 		notifier = adapters.NewSMTPOTPNotifier(smtp)
-	} else {
-		log.Println("WARNING: SMTP_HOST not set — 2FA OTP codes will be logged, not emailed.")
+	default:
+		log.Println("WARNING: no email provider configured (RESEND_API_KEY/SMTP_HOST) — 2FA OTP codes will be logged, not emailed.")
 		notifier = adapters.NewLogOTPNotifier()
 	}
 

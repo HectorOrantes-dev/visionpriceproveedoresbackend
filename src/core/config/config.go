@@ -30,6 +30,10 @@ type Config struct {
 	SMTPFrom     string
 	SMTPFromName string
 
+	// Resend (HTTP email API — preferred when SMTP ports are blocked, e.g. Railway)
+	ResendAPIKey string
+	ResendFrom   string
+
 	// Payments / billing
 	PaymentsEnabled        bool
 	PaymentDefaultGateway  string
@@ -81,6 +85,9 @@ func Load() *Config {
 		SMTPPassword: getEnv("SMTP_PASSWORD", ""),
 		SMTPFrom:     getEnv("SMTP_FROM", ""),
 		SMTPFromName: getEnv("SMTP_FROM_NAME", "VisionPriceProveedores"),
+
+		ResendAPIKey: getEnv("RESEND_API_KEY", ""),
+		ResendFrom:   getEnv("RESEND_FROM", "VisionPrice <onboarding@resend.dev>"),
 
 		JWTExpirationMinutes:           getEnvAsInt("JWT_EXPIRATION_MINUTES", 15),
 		RefreshTokenExpirationHours:    getEnvAsInt("REFRESH_TOKEN_EXPIRATION_HOURS", 168),

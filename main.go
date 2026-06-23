@@ -116,7 +116,10 @@ func main() {
 
 	dependenciesRegister.Init(v1, dbPool, subscriptionUseCase, rateLimiter)
 	dependenciesLogin.Init(v1, dbPool, cfg.JWTSecret, cfg.JWTExpirationMinutes, cfg.OTPExpirationMinutes, cfg.PasswordResetExpirationMinutes, rateLimiter)
-	dependencies2FA.Init(v1, dbPool, csrfManager, cfg.JWTSecret, cfg.OTPExpirationMinutes, cfg.JWTExpirationMinutes, cfg.RefreshTokenExpirationHours, adapters2FA.SMTPConfig{
+	dependencies2FA.Init(v1, dbPool, csrfManager, cfg.JWTSecret, cfg.OTPExpirationMinutes, cfg.JWTExpirationMinutes, cfg.RefreshTokenExpirationHours, adapters2FA.ResendConfig{
+		APIKey: cfg.ResendAPIKey,
+		From:   cfg.ResendFrom,
+	}, adapters2FA.SMTPConfig{
 		Host:     cfg.SMTPHost,
 		Port:     cfg.SMTPPort,
 		Username: cfg.SMTPUsername,
