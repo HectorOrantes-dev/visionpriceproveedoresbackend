@@ -126,13 +126,6 @@ func main() {
 		APIKey:    cfg.BrevoAPIKey,
 		FromEmail: cfg.BrevoFromEmail,
 		FromName:  cfg.BrevoFromName,
-	}, adapters2FA.SMTPConfig{
-		Host:     cfg.SMTPHost,
-		Port:     cfg.SMTPPort,
-		Username: cfg.SMTPUsername,
-		Password: cfg.SMTPPassword,
-		From:     cfg.SMTPFrom,
-		FromName: cfg.SMTPFromName,
 	}, rateLimiter)
 	dependenciesGeolocations.Init(v1, dbPool, cfg.JWTSecret)
 	dependenciesProducts.Init(v1, dbPool, csrfManager, subscriptionUseCase, cfg.JWTSecret)
