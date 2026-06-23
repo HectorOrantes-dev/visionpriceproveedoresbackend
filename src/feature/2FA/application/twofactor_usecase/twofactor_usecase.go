@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"fmt"
+	"log"
 	"math/big"
 	"time"
 
@@ -70,6 +71,9 @@ func (uc *TwoFactorUseCase) GenerateOTP(ctx context.Context, providerID string) 
 	}
 
 	if err := uc.notifier.SendOTP(ctx, email, name, code, uc.otpExpirationMinutes); err != nil {
+		// Log the underlying transport error (SMTP timeout, auth rejected, etc.)
+		// so the real cause is visible in runtime logs; the client gets a generic 500.
+		log.Printf("ERROR: failed to send OTP email to provider %s: %v", providerID, err)
 		return domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al enviar el código OTP")
 	}
 
