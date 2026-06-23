@@ -30,9 +30,17 @@ type Config struct {
 	SMTPFrom     string
 	SMTPFromName string
 
-	// Resend (HTTP email API — preferred when SMTP ports are blocked, e.g. Railway)
-	ResendAPIKey string
-	ResendFrom   string
+	// Brevo (HTTP email API — works without a domain via a verified sender)
+	BrevoAPIKey    string
+	BrevoFromEmail string
+	BrevoFromName  string
+
+	// Gmail API (OAuth2 — sends from a real Gmail account, best deliverability, no domain)
+	GmailClientID     string
+	GmailClientSecret string
+	GmailRefreshToken string
+	GmailFrom         string
+	GmailFromName     string
 
 	// Payments / billing
 	PaymentsEnabled        bool
@@ -86,8 +94,15 @@ func Load() *Config {
 		SMTPFrom:     getEnv("SMTP_FROM", ""),
 		SMTPFromName: getEnv("SMTP_FROM_NAME", "VisionPriceProveedores"),
 
-		ResendAPIKey: getEnv("RESEND_API_KEY", ""),
-		ResendFrom:   getEnv("RESEND_FROM", "VisionPrice <onboarding@resend.dev>"),
+		BrevoAPIKey:    getEnv("BREVO_API_KEY", ""),
+		BrevoFromEmail: getEnv("BREVO_FROM_EMAIL", ""),
+		BrevoFromName:  getEnv("BREVO_FROM_NAME", "VisionPrice"),
+
+		GmailClientID:     getEnv("GMAIL_CLIENT_ID", ""),
+		GmailClientSecret: getEnv("GMAIL_CLIENT_SECRET", ""),
+		GmailRefreshToken: getEnv("GMAIL_REFRESH_TOKEN", ""),
+		GmailFrom:         getEnv("GMAIL_FROM", ""),
+		GmailFromName:     getEnv("GMAIL_FROM_NAME", "VisionPrice"),
 
 		JWTExpirationMinutes:           getEnvAsInt("JWT_EXPIRATION_MINUTES", 15),
 		RefreshTokenExpirationHours:    getEnvAsInt("REFRESH_TOKEN_EXPIRATION_HOURS", 168),

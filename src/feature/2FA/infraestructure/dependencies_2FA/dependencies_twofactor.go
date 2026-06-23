@@ -17,22 +17,26 @@ import (
 )
 
 // Init wires all dependencies for the 2FA feature and registers routes.
-func Init(router *gin.RouterGroup, db *pgxpool.Pool, csrfManager *csrf.Manager, jwtSecret string, otpExpirationMinutes int, jwtExpirationMinutes int, refreshTokenExpirationHours int, resend adapters.ResendConfig, smtp adapters.SMTPConfig, rateLimiter *middleware.RateLimiter) {
+func Init(router *gin.RouterGroup, db *pgxpool.Pool, csrfManager *csrf.Manager, jwtSecret string, otpExpirationMinutes int, jwtExpirationMinutes int, refreshTokenExpirationHours int, gmail adapters.GmailConfig, brevo adapters.BrevoConfig, smtp adapters.SMTPConfig, rateLimiter *middleware.RateLimiter) {
 	// Repository
 	repo := adapters.NewSupabaseTwoFactorRepository(db)
 
-	// OTP notifier selection by priority:
-	//   1. Resend (HTTP/443) — preferred; works where SMTP ports are blocked (Railway).
-	//   2. SMTP — when no Resend key but an SMTP host is configured.
-	//   3. Log fallback — neither configured (dev): the code is logged, not emailed.
+	// OTP notifier selection by priority (the HTTP-based ones use 443, so they
+	// work where SMTP ports are blocked, e.g. Railway):
+	//   1. Gmail API — OAuth2; sends from a real Gmail, best deliverability, no domain.
+	//   2. Brevo     — HTTP API; sends to any recipient with just a verified sender (no domain).
+	//   3. SMTP      — only where outbound SMTP is allowed.
+	//   4. Log fallback — nothing configured (dev): the code is logged, not emailed.
 	var notifier domain.OTPNotifier
 	switch {
-	case resend.APIKey != "":
-		notifier = adapters.NewResendOTPNotifier(resend)
+	case gmail.RefreshToken != "":
+		notifier = adapters.NewGmailOTPNotifier(gmail)
+	case brevo.APIKey != "":
+		notifier = adapters.NewBrevoOTPNotifier(brevo)
 	case smtp.Host != "":
 		notifier = adapters.NewSMTPOTPNotifier(smtp)
 	default:
-		log.Println("WARNING: no email provider configured (RESEND_API_KEY/SMTP_HOST) — 2FA OTP codes will be logged, not emailed.")
+		log.Println("WARNING: no email provider configured (GMAIL_REFRESH_TOKEN/BREVO_API_KEY/SMTP_HOST) — 2FA OTP codes will be logged, not emailed.")
 		notifier = adapters.NewLogOTPNotifier()
 	}
 
