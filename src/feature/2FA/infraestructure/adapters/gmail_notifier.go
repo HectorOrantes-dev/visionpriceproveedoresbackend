@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"net/url"
 	"strings"
@@ -89,10 +90,15 @@ func (n *GmailOTPNotifier) SendOTP(ctx context.Context, email, name, code string
 }
 
 // buildMessage assembles the RFC 5322 message that Gmail will send.
+//
+// To avoid UTF-8 mojibake (e.g. "código" → "cÃ³digo"), non-ASCII headers are
+// RFC 2047 encoded and the body is base64-encoded with an explicit charset and
+// Content-Transfer-Encoding, so the recipient decodes the bytes intact.
 func (n *GmailOTPNotifier) buildMessage(email, name, code string, expirationMinutes int) string {
 	from := n.cfg.From
 	if n.cfg.FromName != "" {
-		from = fmt.Sprintf("%s <%s>", n.cfg.FromName, n.cfg.From)
+		// mime.QEncoding only encodes when the value has non-ASCII chars.
+		from = fmt.Sprintf("%s <%s>", mime.QEncoding.Encode("UTF-8", n.cfg.FromName), n.cfg.From)
 	}
 	greeting := "Hola"
 	if name != "" {
@@ -103,14 +109,32 @@ func (n *GmailOTPNotifier) buildMessage(email, name, code string, expirationMinu
 			"Este código expira en %d minuto(s). Si no solicitaste este código, ignora este correo.\r\n",
 		greeting, code, expirationMinutes)
 
+	subject := mime.QEncoding.Encode("UTF-8", "Tu código de verificación VisionPrice")
+
 	var msg strings.Builder
 	fmt.Fprintf(&msg, "From: %s\r\n", from)
 	fmt.Fprintf(&msg, "To: %s\r\n", email)
-	fmt.Fprintf(&msg, "Subject: Tu código de verificación VisionPrice\r\n")
+	fmt.Fprintf(&msg, "Subject: %s\r\n", subject)
 	fmt.Fprintf(&msg, "MIME-Version: 1.0\r\n")
 	fmt.Fprintf(&msg, "Content-Type: text/plain; charset=\"UTF-8\"\r\n")
-	fmt.Fprintf(&msg, "\r\n%s", body)
+	fmt.Fprintf(&msg, "Content-Transfer-Encoding: base64\r\n")
+	fmt.Fprintf(&msg, "\r\n%s", wrapBase64([]byte(body)))
 	return msg.String()
+}
+
+// wrapBase64 base64-encodes data and wraps it at 76 characters per RFC 2045.
+func wrapBase64(data []byte) string {
+	encoded := base64.StdEncoding.EncodeToString(data)
+	var b strings.Builder
+	for i := 0; i < len(encoded); i += 76 {
+		end := i + 76
+		if end > len(encoded) {
+			end = len(encoded)
+		}
+		b.WriteString(encoded[i:end])
+		b.WriteString("\r\n")
+	}
+	return b.String()
 }
 
 // getAccessToken returns a valid OAuth2 access token, refreshing it via the
