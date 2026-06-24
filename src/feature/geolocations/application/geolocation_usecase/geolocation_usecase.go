@@ -13,6 +13,12 @@ import (
 
 const earthRadiusKm = 6371.0
 
+// Default location (Ciudad de México) used when the client omits coordinates.
+const (
+	defaultLat = 19.4326
+	defaultLng = -99.1332
+)
+
 // GeolocationUseCase contains business logic for geolocation operations.
 type GeolocationUseCase struct {
 	repo domain.GeolocationRepository
@@ -30,10 +36,20 @@ func (uc *GeolocationUseCase) SetLocation(ctx context.Context, providerID string
 		return nil, domainErrors.NewDomainError(domainErrors.ErrValidation, "ID de proveedor inválido")
 	}
 
+	// Default to Ciudad de México when coordinates are not provided.
+	lat := defaultLat
+	if req.Lat != nil {
+		lat = *req.Lat
+	}
+	lng := defaultLng
+	if req.Lng != nil {
+		lng = *req.Lng
+	}
+
 	location := &entities.ProviderLocation{
 		ProviderID:       pid,
-		Lat:              req.Lat,
-		Lng:              req.Lng,
+		Lat:              lat,
+		Lng:              lng,
 		DeliveryRadiusKm: req.DeliveryRadiusKm,
 	}
 
