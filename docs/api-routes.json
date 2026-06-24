@@ -1,0 +1,59 @@
+{
+  "baseUrl": "https://visionpriceproveedoresbackend-production.up.railway.app",
+  "apiPrefix": "/api/v1",
+  "envelope": { "success": "boolean", "message": "string", "data": "object|null" },
+  "auth": {
+    "tempToken": "Bearer <temp_token> (solo para /auth/2fa/*)",
+    "accessToken": "Bearer <access_token> (rutas protegidas normales)",
+    "adminToken": "Bearer <token> de /admin/login (rol USER_SYS_ADMIN)",
+    "csrf": "Header X-CSRF-Token en POST/PUT/PATCH/DELETE de grupos con CSRF",
+    "reauth": "Header X-Confirm-Password en acciones sensibles"
+  },
+  "routes": [
+    { "group": "Auth", "method": "POST", "path": "/api/v1/auth/register", "auth": "público", "body": { "business_name": "string", "rfc": "string(12-13 alfanum)", "email": "string", "phone": "string(10-20)", "password": "string(8-72)" }, "desc": "Registrar proveedor" },
+    { "group": "Auth", "method": "POST", "path": "/api/v1/auth/login", "auth": "público", "body": { "email": "string", "password": "string" }, "returns": { "temp_token": "string", "requires_2fa": true }, "desc": "Paso 1 login → temp_token" },
+    { "group": "Auth", "method": "POST", "path": "/api/v1/auth/2fa/generate", "auth": "Bearer temp_token", "body": null, "desc": "Envía OTP por correo (Gmail API)" },
+    { "group": "Auth", "method": "POST", "path": "/api/v1/auth/2fa/verify", "auth": "Bearer temp_token", "body": { "code": "string(6)" }, "returns": { "access_token": "string", "refresh_token": "string", "csrf_token": "string" }, "desc": "Verifica OTP → sesión" },
+    { "group": "Auth", "method": "GET", "path": "/api/v1/auth/me", "auth": "Bearer access", "returns": { "id": "uuid", "business_name": "string", "rfc": "string", "email": "string", "phone": "string", "created_at": "datetime" }, "desc": "Perfil del proveedor autenticado" },
+    { "group": "Auth", "method": "POST", "path": "/api/v1/auth/refresh", "auth": "público", "body": { "refresh_token": "string" }, "returns": { "access_token": "string" }, "desc": "Renueva access token" },
+    { "group": "Auth", "method": "POST", "path": "/api/v1/auth/logout", "auth": "Bearer access", "body": { "refresh_token": "string" }, "desc": "Cierra sesión / revoca refresh" },
+    { "group": "Auth", "method": "POST", "path": "/api/v1/auth/forgot-password", "auth": "público", "body": { "email": "string" }, "desc": "Solicita recuperación (stub)" },
+    { "group": "Auth", "method": "POST", "path": "/api/v1/auth/reset-password", "auth": "público", "body": { "token": "string", "new_password": "string(8+)" }, "desc": "Restablece contraseña" },
+
+    { "group": "Products", "method": "GET", "path": "/api/v1/products", "auth": "Bearer access", "desc": "Lista productos del proveedor" },
+    { "group": "Products", "method": "POST", "path": "/api/v1/products", "auth": "Bearer access + X-CSRF-Token", "body": { "name": "string", "unit": "string", "category": "string", "price": "number", "description": "string?" }, "desc": "Crear producto" },
+    { "group": "Products", "method": "GET", "path": "/api/v1/products/:id", "auth": "Bearer access", "desc": "Detalle de producto" },
+    { "group": "Products", "method": "PUT", "path": "/api/v1/products/:id", "auth": "Bearer access + X-CSRF-Token", "body": { "name": "string?", "unit": "string?", "category": "string?", "price": "number?", "description": "string?" }, "desc": "Actualizar producto" },
+    { "group": "Products", "method": "DELETE", "path": "/api/v1/products/:id", "auth": "Bearer access + X-CSRF-Token + X-Confirm-Password", "desc": "Eliminar producto (acción sensible)" },
+
+    { "group": "Metrics", "method": "GET", "path": "/api/v1/metrics/summary", "auth": "Bearer access", "desc": "Resumen de métricas" },
+    { "group": "Metrics", "method": "GET", "path": "/api/v1/metrics/top-products", "auth": "Bearer access", "desc": "Productos top" },
+
+    { "group": "Geolocation", "method": "GET", "path": "/api/v1/providers/location", "auth": "Bearer access", "desc": "Obtener ubicación del proveedor" },
+    { "group": "Geolocation", "method": "PUT", "path": "/api/v1/providers/location", "auth": "Bearer access", "body": { "lat": "number", "lng": "number" }, "desc": "Fijar ubicación" },
+    { "group": "Geolocation", "method": "POST", "path": "/api/v1/providers/location/check", "auth": "Bearer access", "body": { "lat": "number", "lng": "number" }, "desc": "Verificar punto" },
+
+    { "group": "Extractions", "method": "POST", "path": "/api/v1/extractions/detect-columns", "auth": "Bearer access", "desc": "Detectar columnas de archivo" },
+    { "group": "Extractions", "method": "POST", "path": "/api/v1/extractions/mapping", "auth": "Bearer access", "desc": "Guardar mapeo de columnas" },
+    { "group": "Extractions", "method": "GET", "path": "/api/v1/extractions/mapping", "auth": "Bearer access", "desc": "Obtener mapeo guardado" },
+    { "group": "Extractions", "method": "POST", "path": "/api/v1/extractions/import", "auth": "Bearer access", "desc": "Procesar importación" },
+
+    { "group": "Subscriptions", "method": "GET", "path": "/api/v1/subscription", "auth": "Bearer access", "desc": "Suscripción actual del proveedor" },
+    { "group": "Subscriptions", "method": "GET", "path": "/api/v1/plans", "auth": "Bearer access", "desc": "Lista de planes disponibles" },
+
+    { "group": "Payments", "method": "POST", "path": "/api/v1/subscription/checkout", "auth": "Bearer access + X-CSRF-Token + X-Confirm-Password", "body": { "plan_code": "pro|max", "gateway": "conekta|paypal", "payment_token": "string (solo Conekta)" }, "desc": "Iniciar checkout de suscripción" },
+    { "group": "Payments", "method": "POST", "path": "/api/v1/webhooks/conekta", "auth": "firma del gateway", "desc": "Webhook Conekta" },
+    { "group": "Payments", "method": "POST", "path": "/api/v1/webhooks/paypal", "auth": "firma del gateway", "desc": "Webhook PayPal" },
+
+    { "group": "ML", "method": "POST", "path": "/api/v1/ml/products/classify", "auth": "Bearer", "desc": "Clasificar producto" },
+    { "group": "ML", "method": "GET", "path": "/api/v1/ml/products/duplicates", "auth": "Bearer", "desc": "Detectar duplicados" },
+    { "group": "ML", "method": "GET", "path": "/api/v1/ml/products/anomalies", "auth": "Bearer", "desc": "Detectar anomalías de precio" },
+
+    { "group": "Admin", "method": "POST", "path": "/api/v1/admin/login", "auth": "público", "body": { "email": "string", "password": "string(8+)" }, "returns": { "token": "string", "role": "USER_SYS_ADMIN" }, "desc": "Login admin (sin 2FA)" },
+    { "group": "Admin", "method": "GET", "path": "/api/v1/admin/metrics", "auth": "Bearer admin (USER_SYS_ADMIN)", "desc": "Métricas globales" },
+    { "group": "Admin", "method": "GET", "path": "/api/v1/admin/geography/providers", "auth": "Bearer admin", "desc": "Pines de proveedores para mapa" },
+    { "group": "Admin", "method": "GET", "path": "/api/v1/admin/subscriptions/expiring", "auth": "Bearer admin", "query": { "days": "int? (default 7, máx 365)" }, "desc": "Suscripciones por vencer" },
+
+    { "group": "Health", "method": "GET", "path": "/health", "auth": "público", "desc": "Healthcheck (sin prefijo /api/v1)" }
+  ]
+}

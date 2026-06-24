@@ -26,6 +26,7 @@ import (
 	paymentAdapters "github.com/visionprice/proveedores-backend/src/feature/payments/infraestructure/adapters"
 	dependenciesPayments "github.com/visionprice/proveedores-backend/src/feature/payments/infraestructure/dependencies_payments"
 	dependenciesProducts "github.com/visionprice/proveedores-backend/src/feature/products/infraestructure/dependencies_products"
+	dependenciesProfile "github.com/visionprice/proveedores-backend/src/feature/profile/infraestructure/dependencies_profile"
 	dependenciesRegister "github.com/visionprice/proveedores-backend/src/feature/register/infraestructure/dependencies_register"
 	dependenciesSubscriptions "github.com/visionprice/proveedores-backend/src/feature/subscriptions/infraestructure/dependencies_subscriptions"
 
@@ -128,6 +129,7 @@ func main() {
 		FromName:  cfg.BrevoFromName,
 	}, rateLimiter)
 	dependenciesGeolocations.Init(v1, dbPool, cfg.JWTSecret)
+	dependenciesProfile.Init(v1, dbPool, cfg.JWTSecret)
 	dependenciesProducts.Init(v1, dbPool, csrfManager, subscriptionUseCase, cfg.JWTSecret)
 	dependenciesExtracciones.Init(v1, dbPool, subscriptionUseCase, cfg.JWTSecret)
 	dependenciesAdmin.Init(v1, dbPool, cfg.JWTSecret, cfg.JWTExpirationMinutes, rateLimiter)
