@@ -1,0 +1,24 @@
+{
+  "description": "Duplicados por uso de abreviaciones. Ejemplos: 'pulg' vs 'pulgadas', 'PVC' vs 'policloruro de vinilo', 'No' vs 'Número', 'gal' vs 'galón'. Prueba que TF-IDF capture la similitud a pesar de abreviaciones.",
+  "algorithm": "tfidf_cosine_duplicates",
+  "expected_behavior": "DetectDuplicates debe encontrar 3-4 pares. Los pares con abreviaciones numéricas idénticas ('2 pulg' vs '2 pulgadas') deberían tener score alto. Los de siglas (PVC) pueden tener score menor.",
+  "similarity_threshold": 0.85,
+  "nota_tecnica": "TF-IDF tokeniza por palabras. 'pulg' y 'pulgadas' son tokens DISTINTOS, por lo que la similaridad dependerá de cuántos tokens comparten. Pares con más tokens comunes tendrán scores más altos.",
+  "provider_id": "550e8400-e29b-41d4-a716-446655440009",
+  "products": [
+    {"id": "a9090909-0000-0000-0000-000000000001", "name": "Tubo PVC presion 2 pulgadas", "category": "Plomería", "unit": "m", "price": 23.00},
+    {"id": "a9090909-0000-0000-0000-000000000002", "name": "Tubo PVC presion 2 pulg", "category": "Plomería", "unit": "m", "price": 23.50, "_duplicado_esperado": true, "_par_con": "a9090909-0000-0000-0000-000000000001"},
+    {"id": "a9090909-0000-0000-0000-000000000003", "name": "Varilla Numero 4 hierro corrugado", "category": "Varilla", "unit": "kg", "price": 13.00},
+    {"id": "a9090909-0000-0000-0000-000000000004", "name": "Varilla No 4 hierro corrugado", "category": "Varilla", "unit": "kg", "price": 12.80, "_duplicado_esperado": true, "_par_con": "a9090909-0000-0000-0000-000000000003"},
+    {"id": "a9090909-0000-0000-0000-000000000005", "name": "Pintura acrílica blanca 1 galón interior", "category": "Pintura", "unit": "gal", "price": 200.00},
+    {"id": "a9090909-0000-0000-0000-000000000006", "name": "Pintura acrílica blanca 1 gal interior", "category": "Pintura", "unit": "gal", "price": 198.00, "_duplicado_esperado": true, "_par_con": "a9090909-0000-0000-0000-000000000005"},
+    {"id": "a9090909-0000-0000-0000-000000000007", "name": "Cable THHN calibre 12 negro metros", "category": "Eléctrico", "unit": "m", "price": 3.80},
+    {"id": "a9090909-0000-0000-0000-000000000008", "name": "Cable THHN calibre 12 negro mt", "category": "Eléctrico", "unit": "m", "price": 3.75, "_duplicado_esperado": true, "_par_con": "a9090909-0000-0000-0000-000000000007"},
+    {"id": "a9090909-0000-0000-0000-000000000009", "name": "Cemento portland tipo uno saco 42 kilogramos", "category": "Cemento", "unit": "bls", "price": 65.00},
+    {"id": "a9090909-0000-0000-0000-000000000010", "name": "Cemento portland tipo 1 bls 42 kg", "category": "Cemento", "unit": "bls", "price": 65.50, "_duplicado_esperado": true, "_par_con": "a9090909-0000-0000-0000-000000000009"},
+    {"id": "a9090909-0000-0000-0000-000000000011", "name": "Llave de paso esférica 3/4 pulgadas bronce", "category": "Plomería", "unit": "pza", "price": 60.00},
+    {"id": "a9090909-0000-0000-0000-000000000012", "name": "Block de concreto 15x20x40 centímetros gris", "category": "Mampostería", "unit": "pza", "price": 6.00},
+    {"id": "a9090909-0000-0000-0000-000000000013", "name": "Arena fina de río para repello", "category": "Áridos", "unit": "m3", "price": 210.00},
+    {"id": "a9090909-0000-0000-0000-000000000014", "name": "Brocha de 4 pulgadas cerda natural", "category": "Pintura", "unit": "pza", "price": 45.00}
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "description": "Productos bien nombrados que coinciden claramente con el catálogo maestro (dataset_14). Se esperan scores de confianza altos (> 0.60) porque los nombres son descriptivos y comparten tokens con el catálogo.",
+  "algorithm": "tfidf_cosine_classifier",
+  "expected_behavior": "ClassifyProduct debe retornar una categoría con confianza alta para cada producto. Los matches esperados están documentados en cada entrada.",
+  "usa_catalogo": "dataset_14_catalogo_maestro_estandar.json",
+  "productos_a_clasificar": [
+    {
+      "name": "Cemento portland tipo uno gris bolsa 42 kilos",
+      "match_esperado_id": 1,
+      "match_esperado_nombre": "Cemento Portland",
+      "categoria_esperada": "Cemento y Mortero",
+      "confianza_esperada": "Alta"
+    },
+    {
+      "name": "Varilla corrugada hierro numero cuatro negra 3/8",
+      "match_esperado_id": 8,
+      "match_esperado_nombre": "Varilla Corrugada Hierro",
+      "categoria_esperada": "Acero de Refuerzo",
+      "confianza_esperada": "Alta"
+    },
+    {
+      "name": "Tubo PVC presión agua potable 2 pulgadas",
+      "match_esperado_id": 17,
+      "match_esperado_nombre": "Tubo PVC Presión",
+      "categoria_esperada": "Plomería",
+      "confianza_esperada": "Alta"
+    },
+    {
+      "name": "Cable eléctrico THHN calibre doce negro metro",
+      "match_esperado_id": 13,
+      "match_esperado_nombre": "Cable Eléctrico THHN",
+      "categoria_esperada": "Material Eléctrico",
+      "confianza_esperada": "Alta"
+    },
+    {
+      "name": "Pintura acrílica blanca para interiores galón",
+      "match_esperado_id": 21,
+      "match_esperado_nombre": "Pintura Acrílica",
+      "categoria_esperada": "Pinturas y Recubrimientos",
+      "confianza_esperada": "Alta"
+    },
+    {
+      "name": "Block concreto hueco 15x20x40 centímetros gris",
+      "match_esperado_id": 5,
+      "match_esperado_nombre": "Block de Concreto",
+      "categoria_esperada": "Mampostería",
+      "confianza_esperada": "Alta"
+    },
+    {
+      "name": "Arena de río cernida fina para mortero",
+      "match_esperado_id": 11,
+      "match_esperado_nombre": "Arena para Construcción",
+      "categoria_esperada": "Áridos",
+      "confianza_esperada": "Alta"
+    },
+    {
+      "name": "Breaker termomagnético un polo 20 amperios Square D",
+      "match_esperado_id": 15,
+      "match_esperado_nombre": "Breaker Termomagnético",
+      "categoria_esperada": "Material Eléctrico",
+      "confianza_esperada": "Alta"
+    },
+    {
+      "name": "Impermeabilizante acrílico blanco para techos galón Sika",
+      "match_esperado_id": 23,
+      "match_esperado_nombre": "Impermeabilizante",
+      "categoria_esperada": "Pinturas y Recubrimientos",
+      "confianza_esperada": "Alta"
+    },
+    {
+      "name": "Angulo acero estructural 2x2 pulgadas barra",
+      "match_esperado_id": 25,
+      "match_esperado_nombre": "Angulo de Acero Estructural",
+      "categoria_esperada": "Acero Estructural",
+      "confianza_esperada": "Alta"
+    },
+    {
+      "name": "Triplay pino cuatro por ocho pies 12 milímetros",
+      "match_esperado_id": 29,
+      "match_esperado_nombre": "Triplay de Pino",
+      "categoria_esperada": "Madera",
+      "confianza_esperada": "Media-Alta"
+    },
+    {
+      "name": "Azulejo cerámico piso 60x60 centímetros gris mate",
+      "match_esperado_id": 30,
+      "match_esperado_nombre": "Azulejo Cerámico para Piso",
+      "categoria_esperada": "Cerámica y Pisos",
+      "confianza_esperada": "Alta"
+    }
+  ]
+}

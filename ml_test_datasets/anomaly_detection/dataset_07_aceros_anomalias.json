@@ -1,0 +1,29 @@
+{
+  "description": "Perfiles de acero y metal con 3 anomalías en precio por kg. Útil para validar que el Isolation Forest funciona correctamente con productos de alto valor unitario.",
+  "algorithm": "isolation_forest",
+  "expected_behavior": "Isolation Forest DEBE detectar 2-3 anomalías. Angulo 2x2 con precio 8x el mercado, Platina con precio casi cero, Tubo cuadrado con precio 6x.",
+  "anomaly_threshold": 0.65,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440007",
+  "market_prices_by_category_unit": {
+    "Perfil de Acero|kg": [18.0,19.0,18.5,19.5,18.0,20.0,19.0,18.5,19.5,18.0,19.0,18.8,19.2,18.5,19.5,18.0,19.0,18.5,19.5,18.0,18.8,19.2,18.5,19.5,18.0,19.0,18.5,19.5,18.0,19.0],
+    "Tubo Cuadrado Acero|kg": [20.0,21.0,20.5,21.5,20.0,22.0,21.0,20.5,21.5,20.0,21.0,20.8,21.2,20.5,21.5,20.0,21.0,20.5,21.5,20.0,20.8,21.2,20.5,21.5,20.0,21.0,20.5,21.5,20.0,21.0],
+    "Platina Acero|kg": [17.0,18.0,17.5,18.5,17.0,19.0,18.0,17.5,18.5,17.0,18.0,17.8,18.2,17.5,18.5,17.0,18.0,17.5,18.5,17.0,17.8,18.2,17.5,18.5,17.0,18.0,17.5,18.5,17.0,18.0],
+    "Canal C Acero|kg": [16.0,17.0,16.5,17.5,16.0,18.0,17.0,16.5,17.5,16.0,17.0,16.8,17.2,16.5,17.5,16.0,17.0,16.5,17.5,16.0,16.8,17.2,16.5,17.5,16.0,17.0,16.5,17.5,16.0,17.0]
+  },
+  "products": [
+    {"id": "a7070707-0000-0000-0000-000000000001", "name": "Ángulo de Acero 1x1x1/8 pulg", "category": "Perfil de Acero", "unit": "kg", "price": 18.50},
+    {"id": "a7070707-0000-0000-0000-000000000002", "name": "Ángulo de Acero 1.5x1.5x1/8 pulg", "category": "Perfil de Acero", "unit": "kg", "price": 18.80},
+    {"id": "a7070707-0000-0000-0000-000000000003", "name": "Ángulo de Acero 2x2x3/16 pulg Importado Certificado ASTM", "category": "Perfil de Acero", "unit": "kg", "price": 152.00, "_anomalia": true, "_razon": "Precio 8x el mercado por kg"},
+    {"id": "a7070707-0000-0000-0000-000000000004", "name": "Ángulo de Acero 3x3x1/4 pulg", "category": "Perfil de Acero", "unit": "kg", "price": 19.20},
+    {"id": "a7070707-0000-0000-0000-000000000005", "name": "Tubo Cuadrado 1x1x1/16 pulg", "category": "Tubo Cuadrado Acero", "unit": "kg", "price": 20.80},
+    {"id": "a7070707-0000-0000-0000-000000000006", "name": "Tubo Cuadrado 2x2x1/8 pulg", "category": "Tubo Cuadrado Acero", "unit": "kg", "price": 21.20},
+    {"id": "a7070707-0000-0000-0000-000000000007", "name": "Tubo Cuadrado 3x3x3/16 Acero Inoxidable 304", "category": "Tubo Cuadrado Acero", "unit": "kg", "price": 128.00, "_anomalia": true, "_razon": "Precio 6x el mercado, inoxidable en categoría de acero negro"},
+    {"id": "a7070707-0000-0000-0000-000000000008", "name": "Tubo Rectangular 1x2x1/16 pulg", "category": "Tubo Cuadrado Acero", "unit": "kg", "price": 21.00},
+    {"id": "a7070707-0000-0000-0000-000000000009", "name": "Platina 1/8x1 pulg Estándar", "category": "Platina Acero", "unit": "kg", "price": 17.80},
+    {"id": "a7070707-0000-0000-0000-000000000010", "name": "Platina 1/4x2 pulg Acero Remate Bodega", "category": "Platina Acero", "unit": "kg", "price": 0.50, "_anomalia": true, "_razon": "Precio casi cero, posible error de captura o fraude"},
+    {"id": "a7070707-0000-0000-0000-000000000011", "name": "Platina 3/8x3 pulg Estándar", "category": "Platina Acero", "unit": "kg", "price": 18.20},
+    {"id": "a7070707-0000-0000-0000-000000000012", "name": "Canal C 3x1.5x1/8 pulg", "category": "Canal C Acero", "unit": "kg", "price": 16.80},
+    {"id": "a7070707-0000-0000-0000-000000000013", "name": "Canal C 4x2x3/16 pulg", "category": "Canal C Acero", "unit": "kg", "price": 17.20},
+    {"id": "a7070707-0000-0000-0000-000000000014", "name": "Canal C 6x2x1/4 pulg Viga IPR", "category": "Canal C Acero", "unit": "kg", "price": 17.00}
+  ]
+}

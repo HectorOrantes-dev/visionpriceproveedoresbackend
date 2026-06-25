@@ -1,0 +1,27 @@
+{
+  "description": "Materiales de plomería con 2 anomalías moderadas. Mezcla de precios normales con 2 productos que tienen precios un poco más elevados (no extremos). Prueba sensibilidad del Isolation Forest.",
+  "algorithm": "isolation_forest",
+  "expected_behavior": "Isolation Forest debería detectar 2 anomalías moderadas. Los scores deberían estar en rango 0.65-0.75.",
+  "anomaly_threshold": 0.65,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440004",
+  "market_prices_by_category_unit": {
+    "Tubo PVC|m": [22.0,23.0,22.5,23.5,22.0,24.0,23.0,22.5,23.5,22.0,23.0,22.8,23.2,22.5,23.5,22.0,23.0,22.5,23.5,22.0,22.8,23.2,22.5,23.5,22.0,23.0,22.5,23.5,22.0,23.0],
+    "Codo PVC|pza": [8.0,8.5,9.0,8.5,8.0,9.5,8.5,8.0,9.0,8.5,8.0,8.8,9.0,8.5,9.5,8.0,8.5,9.0,8.5,8.0,8.8,9.0,8.5,9.5,8.0,8.5,9.0,8.5,8.0,8.5],
+    "Llave de Paso|pza": [55.0,60.0,58.0,62.0,55.0,65.0,60.0,58.0,62.0,55.0,60.0,58.0,62.0,56.0,64.0,58.0,60.0,56.0,62.0,58.0,60.0,58.0,62.0,56.0,64.0,58.0,60.0,58.0,62.0,60.0],
+    "Pegamento PVC|lt": [35.0,38.0,36.0,39.0,35.0,40.0,38.0,36.0,39.0,35.0,38.0,36.0,39.0,36.0,40.0,36.0,38.0,36.0,39.0,36.0,38.0,36.0,39.0,36.0,40.0,36.0,38.0,36.0,39.0,38.0]
+  },
+  "products": [
+    {"id": "a4040404-0000-0000-0000-000000000001", "name": "Tubo PVC 1/2 pulgada Presión", "category": "Tubo PVC", "unit": "m", "price": 22.50},
+    {"id": "a4040404-0000-0000-0000-000000000002", "name": "Tubo PVC 3/4 pulgada Presión", "category": "Tubo PVC", "unit": "m", "price": 23.00},
+    {"id": "a4040404-0000-0000-0000-000000000003", "name": "Tubo PVC 1 pulgada Presión", "category": "Tubo PVC", "unit": "m", "price": 23.50},
+    {"id": "a4040404-0000-0000-0000-000000000004", "name": "Tubo PVC 2 pulgadas Drenaje Especial Importado", "category": "Tubo PVC", "unit": "m", "price": 98.00, "_anomalia": true, "_razon": "Precio 4x el mercado para tubo de 2 pulgadas"},
+    {"id": "a4040404-0000-0000-0000-000000000005", "name": "Codo PVC 1/2 pulg 90 grados", "category": "Codo PVC", "unit": "pza", "price": 8.50},
+    {"id": "a4040404-0000-0000-0000-000000000006", "name": "Codo PVC 3/4 pulg 90 grados", "category": "Codo PVC", "unit": "pza", "price": 9.00},
+    {"id": "a4040404-0000-0000-0000-000000000007", "name": "Codo PVC 1 pulg 45 grados", "category": "Codo PVC", "unit": "pza", "price": 9.50},
+    {"id": "a4040404-0000-0000-0000-000000000008", "name": "Llave de Paso 1/2 pulgada Esférica", "category": "Llave de Paso", "unit": "pza", "price": 58.00},
+    {"id": "a4040404-0000-0000-0000-000000000009", "name": "Llave de Paso 3/4 pulgada Esférica", "category": "Llave de Paso", "unit": "pza", "price": 62.00},
+    {"id": "a4040404-0000-0000-0000-000000000010", "name": "Llave de Paso 1 pulgada Compuerta Bronce Premium", "category": "Llave de Paso", "unit": "pza", "price": 380.00, "_anomalia": true, "_razon": "Precio 6x el mercado para llave de 1 pulgada"},
+    {"id": "a4040404-0000-0000-0000-000000000011", "name": "Pegamento PVC 1/4 litro", "category": "Pegamento PVC", "unit": "lt", "price": 36.00},
+    {"id": "a4040404-0000-0000-0000-000000000012", "name": "Pegamento PVC 1 litro", "category": "Pegamento PVC", "unit": "lt", "price": 38.00}
+  ]
+}

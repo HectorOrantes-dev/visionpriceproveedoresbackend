@@ -1,0 +1,57 @@
+{
+  "description": "Productos de categorías completamente ajenas al catálogo maestro: alimentos, ropa, electrónica de consumo, medicamentos. El clasificador los asignará a la categoría más cercana por vocabulario compartido, pero con confianza muy baja.",
+  "algorithm": "tfidf_cosine_classifier",
+  "expected_behavior": "ClassifyProduct retorna un match de categoría incorrecto con confianza muy baja (idealmente < 0.15). Documenta que el algoritmo siempre retorna el mejor score aunque sea bajo.",
+  "usa_catalogo": "dataset_14_catalogo_maestro_estandar.json",
+  "nota_importante": "El algoritmo actual retorna el mejor match aunque la confianza sea 0. No hay umbral de confianza mínima implementado. Estos datasets demuestran la necesidad de añadir un umbral mínimo de confianza.",
+  "productos_sin_match": [
+    {
+      "name": "Arroz blanco grano largo bolsa 5 libras",
+      "categoria_real": "Alimentos",
+      "match_incorrecto_esperado": "Probablemente Mampostería o Áridos por 'blanco', 'bolsa'",
+      "confianza_esperada": "Muy Baja (< 0.1)"
+    },
+    {
+      "name": "Camisa manga larga algodón talla XL azul",
+      "categoria_real": "Ropa",
+      "match_incorrecto_esperado": "Sin tokens en común con el catálogo",
+      "confianza_esperada": "Mínima (≈ 0.0)"
+    },
+    {
+      "name": "Laptop Ryzen 5 16GB RAM 512GB SSD",
+      "categoria_real": "Electrónica",
+      "match_incorrecto_esperado": "Sin tokens relevantes",
+      "confianza_esperada": "Mínima (≈ 0.0)"
+    },
+    {
+      "name": "Pastillas ibuprofeno 400mg caja 30 unidades",
+      "categoria_real": "Medicamentos",
+      "match_incorrecto_esperado": "Posiblemente Cemento y Mortero por 'caja'",
+      "confianza_esperada": "Muy Baja (< 0.05)"
+    },
+    {
+      "name": "Aceite motor SAE 10W40 litro gasolina",
+      "categoria_real": "Lubricantes Automotriz",
+      "match_incorrecto_esperado": "Podría confundirse con Pinturas por 'aceite'",
+      "confianza_esperada": "Muy Baja (< 0.2)"
+    },
+    {
+      "name": "Cerveza artesanal rubia IPA botella 330ml",
+      "categoria_real": "Bebidas",
+      "match_incorrecto_esperado": "Sin tokens en común",
+      "confianza_esperada": "Mínima (≈ 0.0)"
+    },
+    {
+      "name": "Smartphone Samsung Galaxy 128GB negro 5G",
+      "categoria_real": "Electrónica",
+      "match_incorrecto_esperado": "Sin tokens en común",
+      "confianza_esperada": "Mínima (≈ 0.0)"
+    },
+    {
+      "name": "Fertilizante urea granulado 50kg agricultura",
+      "categoria_real": "Agricultura",
+      "match_incorrecto_esperado": "Podría confundirse con Áridos por '50kg', 'granulado'",
+      "confianza_esperada": "Muy Baja (< 0.1)"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "description": "Materiales eléctricos con 3 anomalías de precio. Cable THHN No.10 negro con precio inexplicablemente alto, breaker doble polo con precio de Q4 (prácticamente regalado), y tablero con precio casi 20x el mercado.",
+  "algorithm": "isolation_forest",
+  "expected_behavior": "Isolation Forest DEBE detectar 2-3 anomalías. Los items marcados con _anomalia=true son los candidatos.",
+  "anomaly_threshold": 0.65,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440003",
+  "market_prices_by_category_unit": {
+    "Cable Eléctrico THHN|m": [3.50,4.00,3.80,4.20,3.60,4.10,3.90,4.00,3.70,4.30,3.80,4.00,3.90,4.10,3.80,3.60,4.20,4.00,3.70,3.90,4.00,4.10,3.80,3.90,4.00,3.70,4.10,3.80,4.00,3.90],
+    "Breaker Termomagnético|pza": [45.0,48.0,50.0,52.0,46.0,49.0,51.0,47.0,50.0,52.0,48.0,50.0,46.0,51.0,49.0,48.0,50.0,47.0,51.0,49.0,48.0,50.0,51.0,47.0,49.0,50.0,48.0,51.0,49.0,50.0],
+    "Tablero Eléctrico|pza": [280.0,300.0,290.0,310.0,285.0,295.0,305.0,300.0,290.0,315.0,285.0,300.0,295.0,310.0,285.0,300.0,295.0,285.0,305.0,300.0,290.0,310.0,295.0,300.0,285.0,305.0,290.0,310.0,295.0,300.0],
+    "Tubo Conduit EMT|m": [18.0,19.0,18.5,19.5,18.0,20.0,19.0,18.5,19.5,18.0,19.0,18.8,19.2,18.5,19.5,18.0,19.0,18.5,19.5,18.0,18.8,19.2,18.5,19.5,18.0,19.0,18.5,19.5,18.0,19.0]
+  },
+  "products": [
+    {"id": "a3030303-0000-0000-0000-000000000001", "name": "Cable THHN No. 12 Negro", "category": "Cable Eléctrico THHN", "unit": "m", "price": 3.80},
+    {"id": "a3030303-0000-0000-0000-000000000002", "name": "Cable THHN No. 12 Blanco", "category": "Cable Eléctrico THHN", "unit": "m", "price": 3.80},
+    {"id": "a3030303-0000-0000-0000-000000000003", "name": "Cable THHN No. 12 Rojo", "category": "Cable Eléctrico THHN", "unit": "m", "price": 3.80},
+    {"id": "a3030303-0000-0000-0000-000000000004", "name": "Cable THHN No. 10 Negro", "category": "Cable Eléctrico THHN", "unit": "m", "price": 87.50, "_anomalia": true, "_razon": "Precio 22x el mercado para calibre 10"},
+    {"id": "a3030303-0000-0000-0000-000000000005", "name": "Cable THHN No. 10 Blanco", "category": "Cable Eléctrico THHN", "unit": "m", "price": 4.20},
+    {"id": "a3030303-0000-0000-0000-000000000006", "name": "Breaker 1 Polo 15A Square D", "category": "Breaker Termomagnético", "unit": "pza", "price": 48.00},
+    {"id": "a3030303-0000-0000-0000-000000000007", "name": "Breaker 1 Polo 20A Square D", "category": "Breaker Termomagnético", "unit": "pza", "price": 50.00},
+    {"id": "a3030303-0000-0000-0000-000000000008", "name": "Breaker 2 Polo 30A Eaton Oferta", "category": "Breaker Termomagnético", "unit": "pza", "price": 4.00, "_anomalia": true, "_razon": "Precio 12x menor al mercado, posible error de captura"},
+    {"id": "a3030303-0000-0000-0000-000000000009", "name": "Breaker 2 Polo 40A Siemens", "category": "Breaker Termomagnético", "unit": "pza", "price": 52.00},
+    {"id": "a3030303-0000-0000-0000-000000000010", "name": "Tablero Eléctrico 4 Circuitos", "category": "Tablero Eléctrico", "unit": "pza", "price": 290.00},
+    {"id": "a3030303-0000-0000-0000-000000000011", "name": "Tablero Eléctrico 8 Circuitos", "category": "Tablero Eléctrico", "unit": "pza", "price": 300.00},
+    {"id": "a3030303-0000-0000-0000-000000000012", "name": "Tablero Eléctrico 16 Circuitos Premium Gold", "category": "Tablero Eléctrico", "unit": "pza", "price": 5800.00, "_anomalia": true, "_razon": "Precio 19x el mercado para tablero de 16 circuitos"},
+    {"id": "a3030303-0000-0000-0000-000000000013", "name": "Tubo Conduit EMT 1/2 pulg", "category": "Tubo Conduit EMT", "unit": "m", "price": 18.50},
+    {"id": "a3030303-0000-0000-0000-000000000014", "name": "Tubo Conduit EMT 3/4 pulg", "category": "Tubo Conduit EMT", "unit": "m", "price": 19.00},
+    {"id": "a3030303-0000-0000-0000-000000000015", "name": "Tubo Conduit EMT 1 pulg", "category": "Tubo Conduit EMT", "unit": "m", "price": 19.50}
+  ]
+}

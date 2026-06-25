@@ -1,0 +1,30 @@
+{
+  "description": "Catálogo con exactamente 2 productos. Prueba la condición mínima: 'if len(products) < 2 { return empty }'. Con 2 productos, la función debe ejecutar y comparar el único par posible.",
+  "algorithm": "tfidf_cosine_duplicates",
+  "expected_behavior": "DetectDuplicates debe ejecutar con 2 productos y comparar el único par. Si los 2 productos son similares, retorna 1 par. Si no, retorna 0 pares. NO debe retornar error.",
+  "similarity_threshold": 0.85,
+  "caso_limite": "len(products) == 2, el mínimo absoluto para detectar duplicados",
+  "provider_id": "550e8400-e29b-41d4-a716-446655440018",
+  "scenarios": [
+    {
+      "scenario": "2 productos idénticos en nombre → debe retornar 1 par",
+      "products": [
+        {"id": "c1010101-0000-0000-0000-000000000001", "name": "Cemento portland tipo uno gris saco", "category": "Cemento", "unit": "bls", "price": 65.00},
+        {"id": "c1010101-0000-0000-0000-000000000002", "name": "Portland cemento tipo uno gris saco", "category": "Cemento", "unit": "bls", "price": 65.50}
+      ],
+      "pares_esperados": 1
+    },
+    {
+      "scenario": "2 productos completamente distintos → debe retornar 0 pares",
+      "products": [
+        {"id": "c1010101-0000-0000-0000-000000000003", "name": "Cemento portland tipo uno construcción", "category": "Cemento", "unit": "bls", "price": 65.00},
+        {"id": "c1010101-0000-0000-0000-000000000004", "name": "Taladro percutor eléctrico bosch", "category": "Herramientas", "unit": "pza", "price": 380.00}
+      ],
+      "pares_esperados": 0
+    }
+  ],
+  "products": [
+    {"id": "c1010101-0000-0000-0000-000000000001", "name": "Cemento portland tipo uno gris saco", "category": "Cemento", "unit": "bls", "price": 65.00},
+    {"id": "c1010101-0000-0000-0000-000000000002", "name": "Portland cemento tipo uno gris saco", "category": "Cemento", "unit": "bls", "price": 65.50}
+  ]
+}
