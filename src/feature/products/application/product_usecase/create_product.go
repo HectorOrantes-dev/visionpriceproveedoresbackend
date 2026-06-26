@@ -34,12 +34,25 @@ func (uc *ProductUseCase) CreateProduct(ctx context.Context, providerID string, 
 		}
 	}
 
+	status := "active"
+	if req.Status != nil {
+		status = *req.Status
+	}
+	stock := 0
+	if req.Stock != nil {
+		stock = *req.Stock
+	}
+
 	product := &entities.Product{
 		ProviderID:  pid,
 		Name:        req.Name,
+		SKU:         req.SKU,
+		Brand:       req.Brand,
 		Price:       req.Price,
 		Unit:        req.Unit,
 		Category:    req.Category,
+		Stock:       stock,
+		Status:      status,
 		Description: req.Description,
 		Active:      true,
 	}

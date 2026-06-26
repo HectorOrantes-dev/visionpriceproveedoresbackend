@@ -23,26 +23,34 @@ func NewSupabaseProductRepository(db *pgxpool.Pool) *SupabaseProductRepository {
 // Create inserts a new product into the database.
 func (r *SupabaseProductRepository) Create(ctx context.Context, product *entities.Product) (*entities.Product, error) {
 	query := `
-		INSERT INTO products (provider_id, name, price, unit, category, description)
-		VALUES ($1, $2, $3, $4, $5, $6)
-		RETURNING id, provider_id, name, price, unit, category, description, active, created_at, updated_at
+		INSERT INTO products (provider_id, name, sku, brand, price, unit, category, stock, status, description)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		RETURNING id, provider_id, name, sku, brand, price, unit, category, stock, status, description, active, created_at, updated_at
 	`
 
 	created := &entities.Product{}
 	err := r.db.QueryRow(ctx, query,
 		product.ProviderID,
 		product.Name,
+		product.SKU,
+		product.Brand,
 		product.Price,
 		product.Unit,
 		product.Category,
+		product.Stock,
+		product.Status,
 		product.Description,
 	).Scan(
 		&created.ID,
 		&created.ProviderID,
 		&created.Name,
+		&created.SKU,
+		&created.Brand,
 		&created.Price,
 		&created.Unit,
 		&created.Category,
+		&created.Stock,
+		&created.Status,
 		&created.Description,
 		&created.Active,
 		&created.CreatedAt,
@@ -59,7 +67,7 @@ func (r *SupabaseProductRepository) Create(ctx context.Context, product *entitie
 // FindByID retrieves an active product by ID.
 func (r *SupabaseProductRepository) FindByID(ctx context.Context, productID uuid.UUID) (*entities.Product, error) {
 	query := `
-		SELECT id, provider_id, name, price, unit, category, description, active, created_at, updated_at
+		SELECT id, provider_id, name, sku, brand, price, unit, category, stock, status, description, active, created_at, updated_at
 		FROM products
 		WHERE id = $1 AND active = TRUE
 	`
@@ -69,9 +77,13 @@ func (r *SupabaseProductRepository) FindByID(ctx context.Context, productID uuid
 		&product.ID,
 		&product.ProviderID,
 		&product.Name,
+		&product.SKU,
+		&product.Brand,
 		&product.Price,
 		&product.Unit,
 		&product.Category,
+		&product.Stock,
+		&product.Status,
 		&product.Description,
 		&product.Active,
 		&product.CreatedAt,
@@ -88,7 +100,7 @@ func (r *SupabaseProductRepository) FindByID(ctx context.Context, productID uuid
 // FindAllActive retrieves all active products for a provider.
 func (r *SupabaseProductRepository) FindAllActive(ctx context.Context, providerID uuid.UUID) ([]*entities.Product, error) {
 	query := `
-		SELECT id, provider_id, name, price, unit, category, description, active, created_at, updated_at
+		SELECT id, provider_id, name, sku, brand, price, unit, category, stock, status, description, active, created_at, updated_at
 		FROM products
 		WHERE provider_id = $1 AND active = TRUE
 		ORDER BY created_at DESC
@@ -107,9 +119,13 @@ func (r *SupabaseProductRepository) FindAllActive(ctx context.Context, providerI
 			&product.ID,
 			&product.ProviderID,
 			&product.Name,
+			&product.SKU,
+			&product.Brand,
 			&product.Price,
 			&product.Unit,
 			&product.Category,
+			&product.Stock,
+			&product.Status,
 			&product.Description,
 			&product.Active,
 			&product.CreatedAt,
@@ -131,26 +147,35 @@ func (r *SupabaseProductRepository) FindAllActive(ctx context.Context, providerI
 func (r *SupabaseProductRepository) Update(ctx context.Context, product *entities.Product) (*entities.Product, error) {
 	query := `
 		UPDATE products
-		SET name = $1, price = $2, unit = $3, category = $4, description = $5, updated_at = NOW()
-		WHERE id = $6 AND active = TRUE
-		RETURNING id, provider_id, name, price, unit, category, description, active, created_at, updated_at
+		SET name = $1, sku = $2, brand = $3, price = $4, unit = $5, category = $6,
+		    stock = $7, status = $8, description = $9, updated_at = NOW()
+		WHERE id = $10 AND active = TRUE
+		RETURNING id, provider_id, name, sku, brand, price, unit, category, stock, status, description, active, created_at, updated_at
 	`
 
 	updated := &entities.Product{}
 	err := r.db.QueryRow(ctx, query,
 		product.Name,
+		product.SKU,
+		product.Brand,
 		product.Price,
 		product.Unit,
 		product.Category,
+		product.Stock,
+		product.Status,
 		product.Description,
 		product.ID,
 	).Scan(
 		&updated.ID,
 		&updated.ProviderID,
 		&updated.Name,
+		&updated.SKU,
+		&updated.Brand,
 		&updated.Price,
 		&updated.Unit,
 		&updated.Category,
+		&updated.Stock,
+		&updated.Status,
 		&updated.Description,
 		&updated.Active,
 		&updated.CreatedAt,
