@@ -1,0 +1,37 @@
+{
+  "description": "Materiales de construcción con 4 productos anómalos: 2 con precios extremadamente altos y 2 con precios casi cero. Los demás están dentro del rango normal.",
+  "algorithm": "isolation_forest",
+  "expected_behavior": "Isolation Forest DEBE detectar 3-4 anomalías. Los productos marcados con [ANOMALIA] tienen scores esperados >= 0.65.",
+  "anomaly_threshold": 0.65,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440002",
+  "anomalias_esperadas": [
+    {"product_name": "Cemento Portland Tipo Especial IMPORT", "razon": "Precio 10x el mercado (Q650 vs Q65)"},
+    {"product_name": "Block de Concreto Reforzado Premium", "razon": "Precio 8x el mercado (Q48 vs Q6)"},
+    {"product_name": "Varilla No. 4 Oferta Remate", "razon": "Precio casi cero (Q0.50 vs Q13)"},
+    {"product_name": "Grava Fina Importada Especial", "razon": "Precio 12x el mercado (Q2700 vs Q230)"}
+  ],
+  "market_prices_by_category_unit": {
+    "Cemento|bls": [62.0,63.0,64.0,65.0,65.5,66.0,66.0,67.0,63.5,64.5,65.0,66.5,64.0,65.0,63.0,64.5,65.0,65.5,66.0,64.0,65.5,66.0,63.0,64.5,65.0,65.5,66.0,64.0,65.5,63.5],
+    "Block de Concreto|pza": [5.50,6.00,6.00,6.50,5.80,6.20,6.00,5.90,6.10,6.30,5.70,6.00,6.20,5.80,6.40,6.00,5.90,6.10,6.20,5.80,6.00,6.10,5.90,6.30,6.00,5.70,6.20,6.00,5.80,6.10],
+    "Varilla de Hierro|kg": [12.0,12.5,13.0,13.0,12.8,13.2,12.5,13.0,12.7,13.1,12.9,13.0,12.6,13.2,12.8,13.0,12.5,13.1,12.9,13.0,12.7,13.0,12.8,13.1,12.6,13.2,13.0,12.5,12.9,13.0],
+    "Grava|m3": [220.0,230.0,225.0,235.0,220.0,240.0,230.0,225.0,235.0,220.0,230.0,228.0,232.0,225.0,235.0,220.0,230.0,225.0,235.0,220.0,228.0,232.0,225.0,235.0,220.0,230.0,225.0,235.0,220.0,230.0]
+  },
+  "products": [
+    {"id": "a2020202-0000-0000-0000-000000000001", "name": "Cemento Portland Tipo I", "category": "Cemento", "unit": "bls", "price": 65.00},
+    {"id": "a2020202-0000-0000-0000-000000000002", "name": "Cemento Portland Tipo II", "category": "Cemento", "unit": "bls", "price": 66.50},
+    {"id": "a2020202-0000-0000-0000-000000000003", "name": "Cemento Portland Tipo III", "category": "Cemento", "unit": "bls", "price": 67.00},
+    {"id": "a2020202-0000-0000-0000-000000000004", "name": "Cemento Portland Tipo Especial IMPORT", "category": "Cemento", "unit": "bls", "price": 650.00, "_anomalia": true, "_razon": "Precio 10x el mercado"},
+    {"id": "a2020202-0000-0000-0000-000000000005", "name": "Block de Concreto 15x20x40 cm", "category": "Block de Concreto", "unit": "pza", "price": 6.00},
+    {"id": "a2020202-0000-0000-0000-000000000006", "name": "Block de Concreto 20x20x40 cm", "category": "Block de Concreto", "unit": "pza", "price": 6.50},
+    {"id": "a2020202-0000-0000-0000-000000000007", "name": "Block de Concreto Reforzado Premium", "category": "Block de Concreto", "unit": "pza", "price": 48.00, "_anomalia": true, "_razon": "Precio 8x el mercado"},
+    {"id": "a2020202-0000-0000-0000-000000000008", "name": "Block Sólido Estándar", "category": "Block de Concreto", "unit": "pza", "price": 5.90},
+    {"id": "a2020202-0000-0000-0000-000000000009", "name": "Varilla Corrugada No. 3 (3/8 pulg)", "category": "Varilla de Hierro", "unit": "kg", "price": 12.80},
+    {"id": "a2020202-0000-0000-0000-000000000010", "name": "Varilla No. 4 Oferta Remate", "category": "Varilla de Hierro", "unit": "kg", "price": 0.50, "_anomalia": true, "_razon": "Precio casi cero, posible error de captura"},
+    {"id": "a2020202-0000-0000-0000-000000000011", "name": "Varilla Corrugada No. 5 (5/8 pulg)", "category": "Varilla de Hierro", "unit": "kg", "price": 13.20},
+    {"id": "a2020202-0000-0000-0000-000000000012", "name": "Varilla Corrugada No. 6 (3/4 pulg)", "category": "Varilla de Hierro", "unit": "kg", "price": 13.10},
+    {"id": "a2020202-0000-0000-0000-000000000013", "name": "Grava 1/2 pulgada", "category": "Grava", "unit": "m3", "price": 225.00},
+    {"id": "a2020202-0000-0000-0000-000000000014", "name": "Grava 3/4 pulgada", "category": "Grava", "unit": "m3", "price": 230.00},
+    {"id": "a2020202-0000-0000-0000-000000000015", "name": "Grava Fina Importada Especial", "category": "Grava", "unit": "m3", "price": 2700.00, "_anomalia": true, "_razon": "Precio 12x el mercado"},
+    {"id": "a2020202-0000-0000-0000-000000000016", "name": "Grava 1 pulgada Estándar", "category": "Grava", "unit": "m3", "price": 228.00}
+  ]
+}

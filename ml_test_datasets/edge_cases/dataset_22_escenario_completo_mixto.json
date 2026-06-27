@@ -1,0 +1,18 @@
+{
+  "description": "Escenario mixto completo: catálogo que contiene tanto productos con precios anómalos como duplicados obvios. Ideal para un test de integración (E2E) que llame a todos los endpoints de ML de forma secuencial sobre el mismo proveedor.",
+  "algorithm": "all",
+  "expected_behavior": "Isolation Forest debe detectar el Cemento a Q650. Duplicados debe detectar el par de Pintura Blanca. Clasificador debe clasificar el Cemento y el Block.",
+  "provider_id": "550e8400-e29b-41d4-a716-446655440022",
+  "market_prices_by_category_unit": {
+    "Cemento|bls": [62.0,63.0,64.0,65.0,65.5,66.0,66.0,67.0,63.5,64.5,65.0,66.5,64.0,65.0,63.0,64.5,65.0,65.5,66.0,64.0,65.5,66.0,63.0,64.5,65.0,65.5,66.0,64.0,65.5,63.5],
+    "Pintura|gal": [195.0,200.0,198.0,205.0,195.0,210.0,200.0,198.0,205.0,195.0,200.0,198.0,205.0,196.0,206.0,198.0,200.0,196.0,204.0,198.0,200.0,198.0,205.0,196.0,206.0,198.0,200.0,198.0,205.0,200.0]
+  },
+  "products": [
+    {"id": "c5050505-0000-0000-0000-000000000001", "name": "Cemento Portland Tipo I", "category": "Cemento", "unit": "bls", "price": 65.00},
+    {"id": "c5050505-0000-0000-0000-000000000002", "name": "Cemento Portland Especial Extra", "category": "Cemento", "unit": "bls", "price": 650.00, "_anomalia": true, "_razon": "Precio extremadamente alto"},
+    {"id": "c5050505-0000-0000-0000-000000000003", "name": "Block Concreto 15x20x40", "category": "Mampostería", "unit": "pza", "price": 6.00},
+    {"id": "c5050505-0000-0000-0000-000000000004", "name": "Pintura acrílica blanca exterior galón", "category": "Pintura", "unit": "gal", "price": 200.00},
+    {"id": "c5050505-0000-0000-0000-000000000005", "name": "Pintura blanca acrílica exterior 1 galón", "category": "Pintura", "unit": "gal", "price": 198.00, "_duplicado_de": "c5050505-0000-0000-0000-000000000004"},
+    {"id": "c5050505-0000-0000-0000-000000000006", "name": "Varilla corrugada #4", "category": "Acero", "unit": "kg", "price": 13.00}
+  ]
+}

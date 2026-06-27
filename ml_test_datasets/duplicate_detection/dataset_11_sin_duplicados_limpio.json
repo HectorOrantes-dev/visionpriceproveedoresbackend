@@ -1,0 +1,24 @@
+{
+  "description": "Catálogo limpio sin duplicados. Todos los productos son claramente distintos con vocabulario diferenciado. El algoritmo NO debe reportar ningún par.",
+  "algorithm": "tfidf_cosine_duplicates",
+  "expected_behavior": "DetectDuplicates debe retornar 0 pares. Todos los scores entre cualquier par de productos están por debajo de 0.85.",
+  "similarity_threshold": 0.85,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440011",
+  "products": [
+    {"id": "b2020202-0000-0000-0000-000000000001", "name": "Cemento Portland Tipo I gris", "category": "Cemento", "unit": "bls", "price": 65.00},
+    {"id": "b2020202-0000-0000-0000-000000000002", "name": "Block hueco de concreto gris", "category": "Mampostería", "unit": "pza", "price": 6.00},
+    {"id": "b2020202-0000-0000-0000-000000000003", "name": "Varilla corrugada hierro negro", "category": "Hierro", "unit": "kg", "price": 13.00},
+    {"id": "b2020202-0000-0000-0000-000000000004", "name": "Arena de río para construcción", "category": "Áridos", "unit": "m3", "price": 205.00},
+    {"id": "b2020202-0000-0000-0000-000000000005", "name": "Grava triturada para concreto", "category": "Áridos", "unit": "m3", "price": 230.00},
+    {"id": "b2020202-0000-0000-0000-000000000006", "name": "Taladro percutor eléctrico dewalt", "category": "Herramientas", "unit": "pza", "price": 380.00},
+    {"id": "b2020202-0000-0000-0000-000000000007", "name": "Impermeabilizante elastomérico sika", "category": "Impermeabilizantes", "unit": "gal", "price": 190.00},
+    {"id": "b2020202-0000-0000-0000-000000000008", "name": "Llave stilson ajustable urrea", "category": "Plomería", "unit": "pza", "price": 110.00},
+    {"id": "b2020202-0000-0000-0000-000000000009", "name": "Breaker termomagnético siemens doble polo", "category": "Eléctrico", "unit": "pza", "price": 95.00},
+    {"id": "b2020202-0000-0000-0000-000000000010", "name": "Pintura anticorrosiva rojo minio", "category": "Pintura", "unit": "gal", "price": 185.00},
+    {"id": "b2020202-0000-0000-0000-000000000011", "name": "Tubo galvanizado conduit rígido eléctrico", "category": "Eléctrico", "unit": "m", "price": 22.00},
+    {"id": "b2020202-0000-0000-0000-000000000012", "name": "Pegamento contacto resistente calor", "category": "Adhesivos", "unit": "lt", "price": 42.00},
+    {"id": "b2020202-0000-0000-0000-000000000013", "name": "Malla electrosoldada 6x6 alambre", "category": "Hierro", "unit": "m2", "price": 95.00},
+    {"id": "b2020202-0000-0000-0000-000000000014", "name": "Madera pino cepillada tabla gruesa", "category": "Madera", "unit": "m", "price": 28.00},
+    {"id": "b2020202-0000-0000-0000-000000000015", "name": "Niple galvanizado agua potable", "category": "Plomería", "unit": "pza", "price": 18.00}
+  ]
+}

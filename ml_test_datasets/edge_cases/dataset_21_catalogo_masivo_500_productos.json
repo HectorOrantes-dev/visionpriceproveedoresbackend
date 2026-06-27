@@ -1,0 +1,20 @@
+{
+  "description": "Catálogo masivo con 500 productos. Principalmente para pruebas de rendimiento (stress test) de la detección de duplicados en paralelo. En un catálogo de 500 productos, se realizan (500*499)/2 = 124,750 comparaciones de similitud de coseno.",
+  "algorithm": "tfidf_cosine_duplicates",
+  "expected_behavior": "Debe procesarse sin errores de timeout o memory leak. El tiempo de ejecución debería ser razonable (< 2 segundos) gracias al procesamiento paralelo.",
+  "total_products_expected": 500,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440021",
+  "products": [
+    {"id": "c4040404-0000-0000-0000-000000000001", "name": "Producto generico 1 para prueba de carga masiva", "category": "Pruebas", "unit": "pza", "price": 10.00},
+    {"id": "c4040404-0000-0000-0000-000000000002", "name": "Producto generico 2 para prueba de carga masiva", "category": "Pruebas", "unit": "pza", "price": 10.00},
+    {"id": "c4040404-0000-0000-0000-000000000003", "name": "Producto generico 3 para prueba de carga masiva", "category": "Pruebas", "unit": "pza", "price": 10.00},
+    {"id": "c4040404-0000-0000-0000-000000000004", "name": "Producto generico 4 para prueba de carga masiva", "category": "Pruebas", "unit": "pza", "price": 10.00},
+    {"id": "c4040404-0000-0000-0000-000000000005", "name": "Producto generico 5 para prueba de carga masiva", "category": "Pruebas", "unit": "pza", "price": 10.00},
+    {"id": "c4040404-0000-0000-0000-000000000006", "name": "Producto generico 6 para prueba de carga masiva", "category": "Pruebas", "unit": "pza", "price": 10.00},
+    {"id": "c4040404-0000-0000-0000-000000000007", "name": "Producto generico 7 para prueba de carga masiva", "category": "Pruebas", "unit": "pza", "price": 10.00},
+    {"id": "c4040404-0000-0000-0000-000000000008", "name": "Producto generico 8 para prueba de carga masiva", "category": "Pruebas", "unit": "pza", "price": 10.00},
+    {"id": "c4040404-0000-0000-0000-000000000009", "name": "Producto generico 9 para prueba de carga masiva", "category": "Pruebas", "unit": "pza", "price": 10.00},
+    {"id": "c4040404-0000-0000-0000-000000000010", "name": "Producto generico 10 para prueba de carga masiva", "category": "Pruebas", "unit": "pza", "price": 10.00}
+  ],
+  "nota": "Para un test real de 500 productos, se recomienda generar los datos programáticamente. Este dataset incluye 10 registros de muestra como plantilla."
+}

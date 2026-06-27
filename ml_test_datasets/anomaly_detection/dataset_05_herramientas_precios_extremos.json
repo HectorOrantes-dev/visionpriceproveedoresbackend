@@ -1,0 +1,33 @@
+{
+  "description": "Herramientas con precios extremos. 5 productos tienen precios completamente fuera de rango: algunos 100x el mercado, otros a Q1. Útil para ver la máxima sensibilidad del Isolation Forest.",
+  "algorithm": "isolation_forest",
+  "expected_behavior": "Isolation Forest DEBE detectar todas las 5 anomalías. Scores esperados muy cercanos a 1.0 para los productos extremos.",
+  "anomaly_threshold": 0.65,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440005",
+  "market_prices_by_category_unit": {
+    "Taladro|pza": [350.0,380.0,360.0,400.0,350.0,420.0,380.0,360.0,400.0,350.0,380.0,370.0,390.0,360.0,400.0,350.0,380.0,360.0,400.0,350.0,370.0,390.0,360.0,400.0,350.0,380.0,360.0,400.0,350.0,380.0],
+    "Martillo|pza": [75.0,80.0,78.0,82.0,75.0,85.0,80.0,78.0,82.0,75.0,80.0,78.0,82.0,76.0,84.0,78.0,80.0,76.0,82.0,78.0,80.0,78.0,82.0,76.0,84.0,78.0,80.0,78.0,82.0,80.0],
+    "Nivel de Burbuja|pza": [120.0,130.0,125.0,135.0,120.0,140.0,130.0,125.0,135.0,120.0,130.0,128.0,132.0,125.0,135.0,120.0,130.0,125.0,135.0,120.0,128.0,132.0,125.0,135.0,120.0,130.0,125.0,135.0,120.0,130.0],
+    "Destornillador|pza": [25.0,28.0,26.0,30.0,25.0,32.0,28.0,26.0,30.0,25.0,28.0,26.0,30.0,26.0,32.0,26.0,28.0,26.0,30.0,26.0,28.0,26.0,30.0,26.0,32.0,26.0,28.0,26.0,30.0,28.0],
+    "Metro de Medir|pza": [40.0,45.0,42.0,48.0,40.0,50.0,45.0,42.0,48.0,40.0,45.0,43.0,47.0,42.0,48.0,40.0,45.0,42.0,48.0,40.0,43.0,47.0,42.0,48.0,40.0,45.0,42.0,48.0,40.0,45.0]
+  },
+  "products": [
+    {"id": "a5050505-0000-0000-0000-000000000001", "name": "Taladro Percutor 1/2 pulg Bosch", "category": "Taladro", "unit": "pza", "price": 380.00},
+    {"id": "a5050505-0000-0000-0000-000000000002", "name": "Taladro Percutor 1/2 pulg Makita", "category": "Taladro", "unit": "pza", "price": 395.00},
+    {"id": "a5050505-0000-0000-0000-000000000003", "name": "Taladro Industrial DeWalt con Maletín y Kit Completo Profesional", "category": "Taladro", "unit": "pza", "price": 45000.00, "_anomalia": true, "_razon": "Precio 118x el mercado, completamente fuera de rango"},
+    {"id": "a5050505-0000-0000-0000-000000000004", "name": "Taladro Inalámbrico 18V básico", "category": "Taladro", "unit": "pza", "price": 360.00},
+    {"id": "a5050505-0000-0000-0000-000000000005", "name": "Martillo de Uña 16 oz Stanley", "category": "Martillo", "unit": "pza", "price": 80.00},
+    {"id": "a5050505-0000-0000-0000-000000000006", "name": "Martillo de Uña 20 oz Urrea", "category": "Martillo", "unit": "pza", "price": 82.00},
+    {"id": "a5050505-0000-0000-0000-000000000007", "name": "Martillo Demoledor Macizo Especial", "category": "Martillo", "unit": "pza", "price": 1.00, "_anomalia": true, "_razon": "Precio Q1, casi regalado, posible error de captura"},
+    {"id": "a5050505-0000-0000-0000-000000000008", "name": "Nivel de Burbuja 24 pulg Stanley", "category": "Nivel de Burbuja", "unit": "pza", "price": 128.00},
+    {"id": "a5050505-0000-0000-0000-000000000009", "name": "Nivel Torpedo 9 pulg", "category": "Nivel de Burbuja", "unit": "pza", "price": 125.00},
+    {"id": "a5050505-0000-0000-0000-000000000010", "name": "Nivel Laser Profesional con Trípode Premium", "category": "Nivel de Burbuja", "unit": "pza", "price": 18500.00, "_anomalia": true, "_razon": "Precio 144x el mercado para nivel de burbuja"},
+    {"id": "a5050505-0000-0000-0000-000000000011", "name": "Destornillador Pala 1/4 pulg", "category": "Destornillador", "unit": "pza", "price": 26.00},
+    {"id": "a5050505-0000-0000-0000-000000000012", "name": "Destornillador Estrella No. 2", "category": "Destornillador", "unit": "pza", "price": 28.00},
+    {"id": "a5050505-0000-0000-0000-000000000013", "name": "Set 6 Destornilladores Profesionales", "category": "Destornillador", "unit": "pza", "price": 30.00},
+    {"id": "a5050505-0000-0000-0000-000000000014", "name": "Destornillador Eléctrico Inalámbrico USB Importado", "category": "Destornillador", "unit": "pza", "price": 1.00, "_anomalia": true, "_razon": "Precio Q1, probable error o fraude"},
+    {"id": "a5050505-0000-0000-0000-000000000015", "name": "Metro de Medir 5m Stanley FatMax", "category": "Metro de Medir", "unit": "pza", "price": 45.00},
+    {"id": "a5050505-0000-0000-0000-000000000016", "name": "Metro de Medir 8m Stanley", "category": "Metro de Medir", "unit": "pza", "price": 48.00},
+    {"id": "a5050505-0000-0000-0000-000000000017", "name": "Metro Digital Laser 50m Profesional Topcon", "category": "Metro de Medir", "unit": "pza", "price": 9800.00, "_anomalia": true, "_razon": "Precio 218x el mercado para metro de medir estándar"}
+  ]
+}

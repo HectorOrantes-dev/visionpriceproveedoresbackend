@@ -1,0 +1,24 @@
+{
+  "description": "Duplicados con errores tipográficos (typos). Prueba el límite del tokenizador: si un token tiene un typo, se convierte en un token diferente. Ayuda a entender las limitaciones del enfoque TF-IDF puro.",
+  "algorithm": "tfidf_cosine_duplicates",
+  "expected_behavior": "Duplicados con 1 typo menor pueden NO ser detectados (score < 0.85) porque el token con typo es diferente. Los duplicados con typos en palabras cortas probablemente se pierdan.",
+  "similarity_threshold": 0.85,
+  "nota_limitacion": "TF-IDF es sensible a typos porque 'portlnd' y 'portland' son tokens completamente distintos. Esta limitación es intencional para documentar las restricciones del algoritmo.",
+  "provider_id": "550e8400-e29b-41d4-a716-446655440010",
+  "products": [
+    {"id": "b1010101-0000-0000-0000-000000000001", "name": "Cemento portland tipo uno", "category": "Cemento", "unit": "bls", "price": 65.00},
+    {"id": "b1010101-0000-0000-0000-000000000002", "name": "Cemento portlnd tipo uno", "category": "Cemento", "unit": "bls", "price": 65.50, "_typo": "portlnd->portland", "_deteccion_esperada": false, "_razon": "Typo cambia el token, cosine cae bajo 0.85"},
+    {"id": "b1010101-0000-0000-0000-000000000003", "name": "Varilla corrugada numero cuatro hierro", "category": "Varilla", "unit": "kg", "price": 13.00},
+    {"id": "b1010101-0000-0000-0000-000000000004", "name": "Varilla corrugada numero cuatros hierros", "category": "Varilla", "unit": "kg", "price": 12.80, "_typo": "cuatro->cuatros, hierro->hierros", "_deteccion_esperada": true, "_razon": "Solo afecta 2 de 5 tokens, similaridad puede mantenerse alta"},
+    {"id": "b1010101-0000-0000-0000-000000000005", "name": "Tubo PVC presion dos pulgadas", "category": "Plomería", "unit": "m", "price": 23.00},
+    {"id": "b1010101-0000-0000-0000-000000000006", "name": "Tubo PVC presian dos pulgadas", "category": "Plomería", "unit": "m", "price": 23.50, "_typo": "presion->presian", "_deteccion_esperada": false, "_razon": "Typo en palabra clave cambia un token crítico"},
+    {"id": "b1010101-0000-0000-0000-000000000007", "name": "Pintura acrílica blanca exterior uv", "category": "Pintura", "unit": "gal", "price": 200.00},
+    {"id": "b1010101-0000-0000-0000-000000000008", "name": "Pintura acrilica blanca exterior uv", "category": "Pintura", "unit": "gal", "price": 199.00, "_typo": "acrílica->acrilica (sin tilde)", "_deteccion_esperada": true, "_razon": "La función Tokenize no hace normalización de acentos, pero son caracteres distintos. Puede que se detecte si el IDF penaliza poco."},
+    {"id": "b1010101-0000-0000-0000-000000000009", "name": "Block concreto quince veinte cuarenta", "category": "Mampostería", "unit": "pza", "price": 6.00},
+    {"id": "b1010101-0000-0000-0000-000000000010", "name": "Block concreto quinze veinte cuarenta", "category": "Mampostería", "unit": "pza", "price": 6.20, "_typo": "quince->quinze", "_deteccion_esperada": false, "_razon": "Token completamente distinto"},
+    {"id": "b1010101-0000-0000-0000-000000000011", "name": "Cable thhn negro doce metros rollo", "category": "Eléctrico", "unit": "m", "price": 3.80},
+    {"id": "b1010101-0000-0000-0000-000000000012", "name": "Cable thhn negro doze metros rollo", "category": "Eléctrico", "unit": "m", "price": 3.75, "_typo": "doce->doze", "_deteccion_esperada": false, "_razon": "Token numeral con typo es completamente diferente"},
+    {"id": "b1010101-0000-0000-0000-000000000013", "name": "Cemento blanco decorativo especial fino", "category": "Cemento", "unit": "bls", "price": 68.00},
+    {"id": "b1010101-0000-0000-0000-000000000014", "name": "Arena de río fina para mezcla", "category": "Áridos", "unit": "m3", "price": 205.00}
+  ]
+}

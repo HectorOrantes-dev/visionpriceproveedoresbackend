@@ -1,0 +1,32 @@
+{
+  "description": "Catálogo con duplicados muy obvios: mismos productos escritos con palabras en diferente orden o con/sin artículos. La similitud de coseno debería estar muy cercana a 1.0.",
+  "algorithm": "tfidf_cosine_duplicates",
+  "expected_behavior": "DetectDuplicates debe encontrar 4-5 pares de duplicados. Todos con SimilarityScore >= 0.85. Los pares marcados con _duplicado_de son los esperados.",
+  "similarity_threshold": 0.85,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440008",
+  "pares_esperados": [
+    ["Cemento Portland Tipo I", "Portland Cemento Tipo I"],
+    ["Varilla Corrugada No 4", "No 4 Varilla Corrugada Hierro"],
+    ["Tubo PVC 2 pulgadas Presion", "Tubo Presion PVC 2 pulgadas"],
+    ["Pintura Acrílica Blanca 1 galón", "Pintura Blanca Acrílica galón 1"],
+    ["Clavo de Acero 3 pulgadas", "Clavo 3 pulgadas Acero"]
+  ],
+  "products": [
+    {"id": "a8080808-0000-0000-0000-000000000001", "name": "Cemento Portland Tipo I", "category": "Cemento", "unit": "bls", "price": 65.00},
+    {"id": "a8080808-0000-0000-0000-000000000002", "name": "Portland Cemento Tipo I", "category": "Cemento", "unit": "bls", "price": 66.00, "_duplicado_de": "a8080808-0000-0000-0000-000000000001"},
+    {"id": "a8080808-0000-0000-0000-000000000003", "name": "Varilla Corrugada No 4", "category": "Varilla", "unit": "kg", "price": 13.00},
+    {"id": "a8080808-0000-0000-0000-000000000004", "name": "No 4 Varilla Corrugada Hierro", "category": "Varilla", "unit": "kg", "price": 12.80, "_duplicado_de": "a8080808-0000-0000-0000-000000000003"},
+    {"id": "a8080808-0000-0000-0000-000000000005", "name": "Tubo PVC 2 pulgadas Presion", "category": "Plomería", "unit": "m", "price": 23.00},
+    {"id": "a8080808-0000-0000-0000-000000000006", "name": "Tubo Presion PVC 2 pulgadas", "category": "Plomería", "unit": "m", "price": 23.50, "_duplicado_de": "a8080808-0000-0000-0000-000000000005"},
+    {"id": "a8080808-0000-0000-0000-000000000007", "name": "Pintura Acrílica Blanca 1 galón", "category": "Pintura", "unit": "gal", "price": 200.00},
+    {"id": "a8080808-0000-0000-0000-000000000008", "name": "Pintura Blanca Acrílica galón 1", "category": "Pintura", "unit": "gal", "price": 198.00, "_duplicado_de": "a8080808-0000-0000-0000-000000000007"},
+    {"id": "a8080808-0000-0000-0000-000000000009", "name": "Clavo de Acero 3 pulgadas", "category": "Ferretería", "unit": "lb", "price": 15.00},
+    {"id": "a8080808-0000-0000-0000-000000000010", "name": "Clavo 3 pulgadas Acero", "category": "Ferretería", "unit": "lb", "price": 15.50, "_duplicado_de": "a8080808-0000-0000-0000-000000000009"},
+    {"id": "a8080808-0000-0000-0000-000000000011", "name": "Brocha de Cerda Natural 4 pulgadas", "category": "Pintura", "unit": "pza", "price": 45.00},
+    {"id": "a8080808-0000-0000-0000-000000000012", "name": "Cinta Métrica de 5 metros Stanley", "category": "Herramientas", "unit": "pza", "price": 48.00},
+    {"id": "a8080808-0000-0000-0000-000000000013", "name": "Llave Stilson 14 pulgadas Urrea", "category": "Herramientas", "unit": "pza", "price": 110.00},
+    {"id": "a8080808-0000-0000-0000-000000000014", "name": "Cemento de Contacto 1 litro", "category": "Pegamentos", "unit": "lt", "price": 42.00},
+    {"id": "a8080808-0000-0000-0000-000000000015", "name": "Arena Lavada para Mortero", "category": "Áridos", "unit": "m3", "price": 210.00},
+    {"id": "a8080808-0000-0000-0000-000000000016", "name": "Block de Concreto 15x20x40 Normal", "category": "Mampostería", "unit": "pza", "price": 6.00}
+  ]
+}

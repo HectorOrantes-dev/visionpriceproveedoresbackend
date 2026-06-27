@@ -1,0 +1,35 @@
+{
+  "description": "Catálogo con múltiples grupos de duplicados entrelazados. Grupo A: cementos, Grupo B: varillas, Grupo C: tubos PVC, Grupo D: pinturas. Algunos grupos tienen 3 variantes del mismo producto.",
+  "algorithm": "tfidf_cosine_duplicates",
+  "expected_behavior": "DetectDuplicates debe encontrar 6-8 pares. Dentro de cada grupo, todos los pares deberían superar 0.85. Entre grupos, los scores deberían ser bajos.",
+  "similarity_threshold": 0.85,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440012",
+  "grupos_esperados": {
+    "Grupo A - Cemento Portland": ["b3030303-...-001", "b3030303-...-002", "b3030303-...-003"],
+    "Grupo B - Varilla No 4": ["b3030303-...-005", "b3030303-...-006"],
+    "Grupo C - Tubo PVC 2 pulg": ["b3030303-...-008", "b3030303-...-009", "b3030303-...-010"],
+    "Grupo D - Pintura Blanca": ["b3030303-...-012", "b3030303-...-013"]
+  },
+  "products": [
+    {"id": "b3030303-0000-0000-0000-000000000001", "name": "Cemento portland tipo uno gris saco", "category": "Cemento", "unit": "bls", "price": 65.00},
+    {"id": "b3030303-0000-0000-0000-000000000002", "name": "Saco cemento portland tipo uno gris", "category": "Cemento", "unit": "bls", "price": 65.50, "_grupo": "A"},
+    {"id": "b3030303-0000-0000-0000-000000000003", "name": "Portland cemento gris tipo uno saco", "category": "Cemento", "unit": "bls", "price": 64.00, "_grupo": "A"},
+    {"id": "b3030303-0000-0000-0000-000000000004", "name": "Cemento blanco fino decorativo especial", "category": "Cemento", "unit": "bls", "price": 85.00},
+    {"id": "b3030303-0000-0000-0000-000000000005", "name": "Varilla corrugada numero cuatro hierro 3/8 pulg", "category": "Varilla", "unit": "kg", "price": 13.00},
+    {"id": "b3030303-0000-0000-0000-000000000006", "name": "Varilla hierro corrugada numero cuatro 3/8 pulgadas", "category": "Varilla", "unit": "kg", "price": 12.80, "_grupo": "B"},
+    {"id": "b3030303-0000-0000-0000-000000000007", "name": "Varilla corrugada numero seis hierro 1/2 pulg", "category": "Varilla", "unit": "kg", "price": 13.80},
+    {"id": "b3030303-0000-0000-0000-000000000008", "name": "Tubo PVC presion dos pulgadas agua potable", "category": "Plomería", "unit": "m", "price": 23.00},
+    {"id": "b3030303-0000-0000-0000-000000000009", "name": "Tubo presion PVC dos pulgadas potable agua", "category": "Plomería", "unit": "m", "price": 23.50, "_grupo": "C"},
+    {"id": "b3030303-0000-0000-0000-000000000010", "name": "PVC tubo dos pulgadas presion potable agua", "category": "Plomería", "unit": "m", "price": 22.80, "_grupo": "C"},
+    {"id": "b3030303-0000-0000-0000-000000000011", "name": "Tubo PVC drenaje cuatro pulgadas sanitario", "category": "Plomería", "unit": "m", "price": 45.00},
+    {"id": "b3030303-0000-0000-0000-000000000012", "name": "Pintura acrílica blanca interior para paredes", "category": "Pintura", "unit": "gal", "price": 200.00},
+    {"id": "b3030303-0000-0000-0000-000000000013", "name": "Pintura blanca acrílica paredes interior uso", "category": "Pintura", "unit": "gal", "price": 198.00, "_grupo": "D"},
+    {"id": "b3030303-0000-0000-0000-000000000014", "name": "Pintura epóxica gris para piso industrial", "category": "Pintura", "unit": "gal", "price": 320.00},
+    {"id": "b3030303-0000-0000-0000-000000000015", "name": "Arena lavada fina mortero repello fino", "category": "Áridos", "unit": "m3", "price": 210.00},
+    {"id": "b3030303-0000-0000-0000-000000000016", "name": "Block concreto sólido 15x20x40 cm", "category": "Mampostería", "unit": "pza", "price": 7.50},
+    {"id": "b3030303-0000-0000-0000-000000000017", "name": "Malla galvanizada para cerco 2 metros", "category": "Ferretería", "unit": "m", "price": 55.00},
+    {"id": "b3030303-0000-0000-0000-000000000018", "name": "Tornillo madera punta broca 3 pulgadas", "category": "Ferretería", "unit": "caja", "price": 35.00},
+    {"id": "b3030303-0000-0000-0000-000000000019", "name": "Cable thhn numero doce negro por metro", "category": "Eléctrico", "unit": "m", "price": 3.80},
+    {"id": "b3030303-0000-0000-0000-000000000020", "name": "Impermeabilizante acrílico blanco para techo", "category": "Impermeabilizantes", "unit": "gal", "price": 190.00}
+  ]
+}

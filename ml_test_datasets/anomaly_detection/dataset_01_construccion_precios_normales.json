@@ -1,0 +1,31 @@
+{
+  "description": "Precios completamente normales de materiales de construcción. Todos los precios están dentro del rango de mercado. Sirve como baseline para comparar con datasets con anomalías.",
+  "algorithm": "isolation_forest",
+  "expected_behavior": "Isolation Forest NO debería reportar anomalías. El score de todos los productos debería estar por debajo de 0.65.",
+  "provider_id": "550e8400-e29b-41d4-a716-446655440001",
+  "market_prices_by_category_unit": {
+    "Cemento|bls": [62.0,63.0,64.0,65.0,65.5,66.0,66.0,67.0,63.5,64.5,65.0,66.5,64.0,65.0,63.0,64.5,65.0,65.5,66.0,64.0,65.5,66.0,63.0,64.5,65.0,65.5,66.0,64.0,65.5,63.5],
+    "Block de Concreto|pza": [5.50,6.00,6.00,6.50,5.80,6.20,6.00,5.90,6.10,6.30,5.70,6.00,6.20,5.80,6.40,6.00,5.90,6.10,6.20,5.80,6.00,6.10,5.90,6.30,6.00,5.70,6.20,6.00,5.80,6.10],
+    "Varilla de Hierro|kg": [12.0,12.5,13.0,13.0,12.8,13.2,12.5,13.0,12.7,13.1,12.9,13.0,12.6,13.2,12.8,13.0,12.5,13.1,12.9,13.0,12.7,13.0,12.8,13.1,12.6,13.2,13.0,12.5,12.9,13.0],
+    "Arena|m3": [200.0,210.0,205.0,215.0,200.0,220.0,210.0,205.0,215.0,200.0,210.0,208.0,212.0,205.0,215.0,200.0,210.0,205.0,215.0,200.0,208.0,212.0,205.0,215.0,200.0,210.0,205.0,215.0,200.0,210.0],
+    "Grava|m3": [220.0,230.0,225.0,235.0,220.0,240.0,230.0,225.0,235.0,220.0,230.0,228.0,232.0,225.0,235.0,220.0,230.0,225.0,235.0,220.0,228.0,232.0,225.0,235.0,220.0,230.0,225.0,235.0,220.0,230.0]
+  },
+  "products": [
+    {"id": "a1010101-0000-0000-0000-000000000001", "name": "Cemento Portland Tipo I", "category": "Cemento", "unit": "bls", "price": 65.00},
+    {"id": "a1010101-0000-0000-0000-000000000002", "name": "Cemento Portland Tipo II", "category": "Cemento", "unit": "bls", "price": 66.00},
+    {"id": "a1010101-0000-0000-0000-000000000003", "name": "Cemento Portland Tipo III Alta Resistencia", "category": "Cemento", "unit": "bls", "price": 67.50},
+    {"id": "a1010101-0000-0000-0000-000000000004", "name": "Cemento Blanco Decorativo", "category": "Cemento", "unit": "bls", "price": 64.00},
+    {"id": "a1010101-0000-0000-0000-000000000005", "name": "Block de Concreto 15x20x40 cm", "category": "Block de Concreto", "unit": "pza", "price": 6.00},
+    {"id": "a1010101-0000-0000-0000-000000000006", "name": "Block de Concreto 20x20x40 cm", "category": "Block de Concreto", "unit": "pza", "price": 6.50},
+    {"id": "a1010101-0000-0000-0000-000000000007", "name": "Block de Concreto 10x20x40 cm", "category": "Block de Concreto", "unit": "pza", "price": 5.80},
+    {"id": "a1010101-0000-0000-0000-000000000008", "name": "Block Sólido 15x20x40 cm", "category": "Block de Concreto", "unit": "pza", "price": 6.20},
+    {"id": "a1010101-0000-0000-0000-000000000009", "name": "Varilla Corrugada No. 3 (3/8 pulg)", "category": "Varilla de Hierro", "unit": "kg", "price": 12.80},
+    {"id": "a1010101-0000-0000-0000-000000000010", "name": "Varilla Corrugada No. 4 (1/2 pulg)", "category": "Varilla de Hierro", "unit": "kg", "price": 13.00},
+    {"id": "a1010101-0000-0000-0000-000000000011", "name": "Varilla Corrugada No. 5 (5/8 pulg)", "category": "Varilla de Hierro", "unit": "kg", "price": 13.20},
+    {"id": "a1010101-0000-0000-0000-000000000012", "name": "Varilla Corrugada No. 6 (3/4 pulg)", "category": "Varilla de Hierro", "unit": "kg", "price": 13.00},
+    {"id": "a1010101-0000-0000-0000-000000000013", "name": "Arena de Río Cernida", "category": "Arena", "unit": "m3", "price": 205.00},
+    {"id": "a1010101-0000-0000-0000-000000000014", "name": "Arena Lavada Fina", "category": "Arena", "unit": "m3", "price": 215.00},
+    {"id": "a1010101-0000-0000-0000-000000000015", "name": "Grava 1/2 pulgada Seleccionada", "category": "Grava", "unit": "m3", "price": 225.00},
+    {"id": "a1010101-0000-0000-0000-000000000016", "name": "Grava 3/4 pulgada", "category": "Grava", "unit": "m3", "price": 232.00}
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "description": "Productos con precios diseñados para estar exactamente en la frontera del umbral de anomalía (0.65). Algunos justo por debajo, otros justo por encima. Prueba el comportamiento del Isolation Forest en el límite.",
+  "algorithm": "isolation_forest",
+  "expected_behavior": "El Isolation Forest puede ser no-determinista en la frontera. Algunos runs pueden clasificar los mismos productos de manera diferente. Los 'SEGURO_ANOMALIA' siempre deben ser detectados, los 'SEGURO_NORMAL' nunca.",
+  "anomaly_threshold": 0.65,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440019",
+  "market_prices_by_category_unit": {
+    "Cemento|bls": [62.0,63.0,64.0,65.0,65.5,66.0,66.0,67.0,63.5,64.5,65.0,66.5,64.0,65.0,63.0,64.5,65.0,65.5,66.0,64.0,65.5,66.0,63.0,64.5,65.0,65.5,66.0,64.0,65.5,63.5],
+    "Block de Concreto|pza": [5.50,6.00,6.00,6.50,5.80,6.20,6.00,5.90,6.10,6.30,5.70,6.00,6.20,5.80,6.40,6.00,5.90,6.10,6.20,5.80,6.00,6.10,5.90,6.30,6.00,5.70,6.20,6.00,5.80,6.10]
+  },
+  "products": [
+    {"id": "c2020202-0000-0000-0000-000000000001", "name": "Cemento Normal Precio Promedio", "category": "Cemento", "unit": "bls", "price": 65.00, "_clasificacion": "SEGURO_NORMAL", "_distancia_mercado": "0%"},
+    {"id": "c2020202-0000-0000-0000-000000000002", "name": "Cemento Precio Ligeramente Alto", "category": "Cemento", "unit": "bls", "price": 78.00, "_clasificacion": "FRONTERA_INCIERTO", "_distancia_mercado": "+20%"},
+    {"id": "c2020202-0000-0000-0000-000000000003", "name": "Cemento Precio Moderadamente Alto", "category": "Cemento", "unit": "bls", "price": 95.00, "_clasificacion": "FRONTERA_INCIERTO", "_distancia_mercado": "+46%"},
+    {"id": "c2020202-0000-0000-0000-000000000004", "name": "Cemento Precio Alto Confirmado", "category": "Cemento", "unit": "bls", "price": 130.00, "_clasificacion": "PROBABLE_ANOMALIA", "_distancia_mercado": "+100%"},
+    {"id": "c2020202-0000-0000-0000-000000000005", "name": "Cemento Precio Extremo Claro", "category": "Cemento", "unit": "bls", "price": 650.00, "_clasificacion": "SEGURO_ANOMALIA", "_distancia_mercado": "+900%"},
+    {"id": "c2020202-0000-0000-0000-000000000006", "name": "Block Normal Precio Esperado", "category": "Block de Concreto", "unit": "pza", "price": 6.00, "_clasificacion": "SEGURO_NORMAL", "_distancia_mercado": "0%"},
+    {"id": "c2020202-0000-0000-0000-000000000007", "name": "Block Precio Ligeramente Mayor", "category": "Block de Concreto", "unit": "pza", "price": 7.20, "_clasificacion": "FRONTERA_INCIERTO", "_distancia_mercado": "+20%"},
+    {"id": "c2020202-0000-0000-0000-000000000008", "name": "Block Precio Doble del Mercado", "category": "Block de Concreto", "unit": "pza", "price": 12.00, "_clasificacion": "PROBABLE_ANOMALIA", "_distancia_mercado": "+100%"},
+    {"id": "c2020202-0000-0000-0000-000000000009", "name": "Block Precio Muy Bajo Sospechoso", "category": "Block de Concreto", "unit": "pza", "price": 0.50, "_clasificacion": "SEGURO_ANOMALIA", "_distancia_mercado": "-92%"},
+    {"id": "c2020202-0000-0000-0000-000000000010", "name": "Block Precio Extremo Alto", "category": "Block de Concreto", "unit": "pza", "price": 60.00, "_clasificacion": "SEGURO_ANOMALIA", "_distancia_mercado": "+900%"}
+  ]
+}

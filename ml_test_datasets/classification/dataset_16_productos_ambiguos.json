@@ -1,0 +1,64 @@
+{
+  "description": "Productos con nombres ambiguos o genéricos que podrían encajar en varias categorías del catálogo maestro. Prueba cómo el clasificador maneja la ambigüedad.",
+  "algorithm": "tfidf_cosine_classifier",
+  "expected_behavior": "ClassifyProduct retorna un match pero con confianza baja o media. La categoría devuelta puede o no ser la 'correcta' semánticamente. Documenta las limitaciones del enfoque TF-IDF.",
+  "usa_catalogo": "dataset_14_catalogo_maestro_estandar.json",
+  "productos_ambiguos": [
+    {
+      "name": "Tubo de dos pulgadas",
+      "ambiguedad": "¿PVC presión, PVC drenaje, conduit EMT, tubo cuadrado acero?",
+      "match_posible_id": [14, 17, 18, 26],
+      "confianza_esperada": "Baja (< 0.4)",
+      "razon": "Sin el material (PVC, acero, etc.), el TF-IDF no puede distinguir"
+    },
+    {
+      "name": "Material para construcción resistente",
+      "ambiguedad": "Término demasiado genérico",
+      "match_posible_id": [1, 5, 8, 11],
+      "confianza_esperada": "Muy Baja (< 0.2)",
+      "razon": "Solo el token 'construcción' aparece en el catálogo"
+    },
+    {
+      "name": "Cable número doce",
+      "ambiguedad": "¿Cable THHN, cable desnudo, cable coaxial?",
+      "match_posible_id": [13],
+      "confianza_esperada": "Media (0.4-0.6)",
+      "razon": "El token 'cable' es suficiente para apuntar al eléctrico pero sin 'THHN' la confianza cae"
+    },
+    {
+      "name": "Pintura blanca litro",
+      "ambiguedad": "¿Acrílica, aceite, anticorrosivo?",
+      "match_posible_id": [21, 22, 24],
+      "confianza_esperada": "Media (0.4-0.6)",
+      "razon": "El token 'pintura' es compartido por varios items del catálogo"
+    },
+    {
+      "name": "Hierro corrugado",
+      "ambiguedad": "¿Varilla, malla electrosoldada?",
+      "match_posible_id": [8, 9],
+      "confianza_esperada": "Media-Alta (0.5-0.7)",
+      "razon": "Tokens 'hierro' y 'corrugado' apuntan fuerte a varilla"
+    },
+    {
+      "name": "Madera 2x4",
+      "ambiguedad": "¿Pino, cedro, madera para andamio?",
+      "match_posible_id": [28],
+      "confianza_esperada": "Media (0.4-0.6)",
+      "razon": "Solo token 'madera' comparte con catálogo"
+    },
+    {
+      "name": "Accesorio plomería 1 pulgada",
+      "ambiguedad": "¿Codo, te, llave, unión?",
+      "match_posible_id": [17, 18, 19, 20],
+      "confianza_esperada": "Baja (< 0.3)",
+      "razon": "Genérico, solo 'plomería' coincide"
+    },
+    {
+      "name": "Bloque gris",
+      "ambiguedad": "¿Block concreto, block sólido, ladrillo?",
+      "match_posible_id": [5, 6],
+      "confianza_esperada": "Baja-Media (0.3-0.5)",
+      "razon": "'Bloque' y 'gris' son tokens raros en el catálogo"
+    }
+  ]
+}

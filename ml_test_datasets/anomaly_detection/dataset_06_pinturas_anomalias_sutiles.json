@@ -1,0 +1,27 @@
+{
+  "description": "Pinturas y recubrimientos con anomalías sutiles (20-50% sobre el precio de mercado, no extremas). Prueba la sensibilidad fina del Isolation Forest para detectar sobreprecio moderado.",
+  "algorithm": "isolation_forest",
+  "expected_behavior": "Isolation Forest debería detectar 1-2 anomalías sutiles. Scores en rango 0.65-0.72 para los anómalos. Demuestra los límites de detección.",
+  "anomaly_threshold": 0.65,
+  "provider_id": "550e8400-e29b-41d4-a716-446655440006",
+  "market_prices_by_category_unit": {
+    "Pintura Acrílica|gal": [195.0,200.0,198.0,205.0,195.0,210.0,200.0,198.0,205.0,195.0,200.0,198.0,205.0,196.0,206.0,198.0,200.0,196.0,204.0,198.0,200.0,198.0,205.0,196.0,206.0,198.0,200.0,198.0,205.0,200.0],
+    "Pintura Aceite|gal": [240.0,250.0,245.0,255.0,240.0,260.0,250.0,245.0,255.0,240.0,250.0,248.0,252.0,245.0,255.0,240.0,250.0,245.0,255.0,240.0,248.0,252.0,245.0,255.0,240.0,250.0,245.0,255.0,240.0,250.0],
+    "Impermeabilizante|gal": [180.0,190.0,185.0,195.0,180.0,200.0,190.0,185.0,195.0,180.0,190.0,188.0,192.0,185.0,195.0,180.0,190.0,185.0,195.0,180.0,188.0,192.0,185.0,195.0,180.0,190.0,185.0,195.0,180.0,190.0],
+    "Anticorrosivo|lt": [65.0,70.0,68.0,72.0,65.0,75.0,70.0,68.0,72.0,65.0,70.0,68.0,72.0,66.0,74.0,68.0,70.0,66.0,72.0,68.0,70.0,68.0,72.0,66.0,74.0,68.0,70.0,68.0,72.0,70.0]
+  },
+  "products": [
+    {"id": "a6060606-0000-0000-0000-000000000001", "name": "Pintura Acrílica Blanco Hueso 1 galón Glidden", "category": "Pintura Acrílica", "unit": "gal", "price": 200.00},
+    {"id": "a6060606-0000-0000-0000-000000000002", "name": "Pintura Acrílica Color Varios 1 galón Sherwin", "category": "Pintura Acrílica", "unit": "gal", "price": 205.00},
+    {"id": "a6060606-0000-0000-0000-000000000003", "name": "Pintura Acrílica Premium Exterior Resistente UV", "category": "Pintura Acrílica", "unit": "gal", "price": 295.00, "_anomalia": true, "_razon": "Precio 47% sobre el mercado, sobreprecio moderado"},
+    {"id": "a6060606-0000-0000-0000-000000000004", "name": "Pintura Acrílica Satinada Interior Behr", "category": "Pintura Acrílica", "unit": "gal", "price": 198.00},
+    {"id": "a6060606-0000-0000-0000-000000000005", "name": "Pintura de Aceite Negro Mate 1 galón", "category": "Pintura Aceite", "unit": "gal", "price": 248.00},
+    {"id": "a6060606-0000-0000-0000-000000000006", "name": "Pintura de Aceite Beige 1 galón Comex", "category": "Pintura Aceite", "unit": "gal", "price": 252.00},
+    {"id": "a6060606-0000-0000-0000-000000000007", "name": "Pintura de Aceite Importada Artística Profesional", "category": "Pintura Aceite", "unit": "gal", "price": 390.00, "_anomalia": true, "_razon": "Precio 56% sobre el mercado"},
+    {"id": "a6060606-0000-0000-0000-000000000008", "name": "Impermeabilizante Acrílico 1 galón Sika", "category": "Impermeabilizante", "unit": "gal", "price": 188.00},
+    {"id": "a6060606-0000-0000-0000-000000000009", "name": "Impermeabilizante Elastomérico 1 galón", "category": "Impermeabilizante", "unit": "gal", "price": 192.00},
+    {"id": "a6060606-0000-0000-0000-000000000010", "name": "Impermeabilizante Poliuretano 1 galón Basf", "category": "Impermeabilizante", "unit": "gal", "price": 195.00},
+    {"id": "a6060606-0000-0000-0000-000000000011", "name": "Anticorrosivo Rojo Minio 1 litro", "category": "Anticorrosivo", "unit": "lt", "price": 68.00},
+    {"id": "a6060606-0000-0000-0000-000000000012", "name": "Anticorrosivo Gris 1 litro Rust-Oleum", "category": "Anticorrosivo", "unit": "lt", "price": 72.00}
+  ]
+}
