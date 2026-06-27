@@ -92,6 +92,10 @@ func main() {
 	// Create Gin engine
 	router := gin.Default()
 
+	// Security headers on every response (hardening: nosniff, anti-clickjacking,
+	// HSTS, CSP). Applied first so it also covers errors and 404s.
+	router.Use(middleware.SecurityHeaders())
+
 	// CORS configuration
 	corsConfig := cors.Config{
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
