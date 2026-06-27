@@ -19,6 +19,7 @@ import (
 	adapters2FA "github.com/visionprice/proveedores-backend/src/feature/2FA/infraestructure/adapters"
 	dependencies2FA "github.com/visionprice/proveedores-backend/src/feature/2FA/infraestructure/dependencies_2FA"
 	dependenciesAdmin "github.com/visionprice/proveedores-backend/src/feature/admin/infraestructure/dependencies_admin"
+	dependenciesCatalogo "github.com/visionprice/proveedores-backend/src/feature/catalogo/infraestructure/dependencies_catalogo"
 	dependenciesExtracciones "github.com/visionprice/proveedores-backend/src/feature/extracciones/infraestructure/dependencies_extracciones"
 	dependenciesGeolocations "github.com/visionprice/proveedores-backend/src/feature/geolocations/infraestructure/dependencies_geolocations"
 	dependenciesLogin "github.com/visionprice/proveedores-backend/src/feature/login/infraestructure/dependencies_login"
@@ -130,6 +131,7 @@ func main() {
 	}, rateLimiter)
 	dependenciesGeolocations.Init(v1, dbPool, cfg.JWTSecret)
 	dependenciesProfile.Init(v1, dbPool, cfg.JWTSecret)
+	dependenciesCatalogo.Init(v1, dbPool, cfg.MicroserviceAPIKey)
 	dependenciesProducts.Init(v1, dbPool, csrfManager, subscriptionUseCase, cfg.JWTSecret)
 	dependenciesExtracciones.Init(v1, dbPool, subscriptionUseCase, cfg.JWTSecret)
 	dependenciesAdmin.Init(v1, dbPool, cfg.JWTSecret, cfg.JWTExpirationMinutes, rateLimiter)

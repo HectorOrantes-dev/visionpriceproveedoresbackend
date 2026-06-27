@@ -22,6 +22,9 @@ type Config struct {
 	CORSAllowedOrigins             string
 	EnableSwagger                  bool
 
+	// Microservice (service-to-service API key for the catalog endpoints)
+	MicroserviceAPIKey string
+
 	// Brevo (HTTP email API — works without a domain via a verified sender)
 	BrevoAPIKey    string
 	BrevoFromEmail string
@@ -78,6 +81,8 @@ func Load() *Config {
 		JWTSecret:          jwtSecret,
 		CORSAllowedOrigins: corsOrigins,
 		EnableSwagger:      getEnvAsBool("ENABLE_SWAGGER", false),
+
+		MicroserviceAPIKey: getEnv("MICROSERVICE_API_KEY", ""),
 
 		BrevoAPIKey:    getEnv("BREVO_API_KEY", ""),
 		BrevoFromEmail: getEnv("BREVO_FROM_EMAIL", ""),

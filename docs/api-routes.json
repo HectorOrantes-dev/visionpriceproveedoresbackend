@@ -54,6 +54,9 @@
     { "group": "Admin", "method": "GET", "path": "/api/v1/admin/geography/providers", "auth": "Bearer admin", "desc": "Pines de proveedores para mapa" },
     { "group": "Admin", "method": "GET", "path": "/api/v1/admin/subscriptions/expiring", "auth": "Bearer admin", "query": { "days": "int? (default 7, máx 365)" }, "desc": "Suscripciones por vencer" },
 
+    { "group": "Catalogo (micro)", "method": "GET", "path": "/api/v1/productos/cercanos", "auth": "X-Api-Key", "query": { "lat": "number", "lng": "number", "radio_km": "number? (default 10)", "categoria": "string?" }, "returns": "Producto[]", "desc": "Productos cercanos (haversine) para el gateway" },
+    { "group": "Catalogo (micro)", "method": "GET", "path": "/api/v1/productos", "auth": "X-Api-Key", "query": { "ids": "csv de int, ej. 12,30" }, "returns": "Producto[]", "desc": "Productos por IDs (recálculo de precios)" },
+
     { "group": "Health", "method": "GET", "path": "/health", "auth": "público", "desc": "Healthcheck (sin prefijo /api/v1)" }
   ]
 }
