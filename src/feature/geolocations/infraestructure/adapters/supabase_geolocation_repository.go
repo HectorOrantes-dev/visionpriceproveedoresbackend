@@ -20,28 +20,24 @@ func NewSupabaseGeolocationRepository(db *pgxpool.Pool) *SupabaseGeolocationRepo
 	return &SupabaseGeolocationRepository{db: db}
 }
 
-// UpsertLocation creates or updates the provider's location.
+// UpsertLocation creates or updates the provider's warehouse address.
 func (r *SupabaseGeolocationRepository) UpsertLocation(ctx context.Context, location *entities.ProviderLocation) (*entities.ProviderLocation, error) {
 	query := `
-		INSERT INTO provider_locations (provider_id, lat, lng, delivery_radius_km, updated_at)
-		VALUES ($1, $2, $3, $4, NOW())
+		INSERT INTO provider_locations (provider_id, address, updated_at)
+		VALUES ($1, $2, NOW())
 		ON CONFLICT (provider_id)
-		DO UPDATE SET lat = $2, lng = $3, delivery_radius_km = $4, updated_at = NOW()
-		RETURNING id, provider_id, lat, lng, delivery_radius_km, updated_at
+		DO UPDATE SET address = $2, updated_at = NOW()
+		RETURNING id, provider_id, address, updated_at
 	`
 
 	result := &entities.ProviderLocation{}
 	err := r.db.QueryRow(ctx, query,
 		location.ProviderID,
-		location.Lat,
-		location.Lng,
-		location.DeliveryRadiusKm,
+		location.Address,
 	).Scan(
 		&result.ID,
 		&result.ProviderID,
-		&result.Lat,
-		&result.Lng,
-		&result.DeliveryRadiusKm,
+		&result.Address,
 		&result.UpdatedAt,
 	)
 
@@ -52,10 +48,10 @@ func (r *SupabaseGeolocationRepository) UpsertLocation(ctx context.Context, loca
 	return result, nil
 }
 
-// GetLocation retrieves the provider's location.
+// GetLocation retrieves the provider's warehouse address.
 func (r *SupabaseGeolocationRepository) GetLocation(ctx context.Context, providerID uuid.UUID) (*entities.ProviderLocation, error) {
 	query := `
-		SELECT id, provider_id, lat, lng, delivery_radius_km, updated_at
+		SELECT id, provider_id, address, updated_at
 		FROM provider_locations
 		WHERE provider_id = $1
 	`
@@ -64,9 +60,7 @@ func (r *SupabaseGeolocationRepository) GetLocation(ctx context.Context, provide
 	err := r.db.QueryRow(ctx, query, providerID).Scan(
 		&location.ID,
 		&location.ProviderID,
-		&location.Lat,
-		&location.Lng,
-		&location.DeliveryRadiusKm,
+		&location.Address,
 		&location.UpdatedAt,
 	)
 

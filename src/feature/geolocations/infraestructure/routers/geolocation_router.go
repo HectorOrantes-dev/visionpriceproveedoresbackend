@@ -14,6 +14,5 @@ func SetupGeolocationRoutes(router *gin.RouterGroup, controller *controllers.Geo
 	{
 		providers.PUT("/location", controller.SetLocation)
 		providers.GET("/location", controller.GetLocation)
-		providers.POST("/location/check", controller.CheckPoint)
 	}
 }

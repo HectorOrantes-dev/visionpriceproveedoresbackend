@@ -10,6 +10,7 @@ import (
 	"github.com/visionprice/proveedores-backend/src/core/responses"
 	"github.com/visionprice/proveedores-backend/src/feature/geolocations/application/geolocation_usecase"
 	"github.com/visionprice/proveedores-backend/src/feature/geolocations/domain/entities"
+
 )
 
 // GeolocationController handles HTTP requests for geolocation operations.
@@ -23,13 +24,13 @@ func NewGeolocationController(useCase *geolocation_usecase.GeolocationUseCase) *
 }
 
 // SetLocation godoc
-// @Summary      Fijar o actualizar ubicación del proveedor
-// @Description  Guarda la latitud, longitud y radio de entrega del establecimiento
+// @Summary      Fijar o actualizar dirección del almacén
+// @Description  Guarda la dirección del almacén o sucursal del proveedor
 // @Tags         Geolocations
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Param        body  body      entities.SetLocationRequest  true  "Datos de ubicación"
+// @Param        body  body      entities.SetLocationRequest  true  "Dirección del almacén"
 // @Success      200   {object}  responses.APIResponse{data=entities.ProviderLocation}
 // @Failure      400   {object}  responses.APIResponse
 // @Failure      401   {object}  responses.APIResponse
@@ -58,8 +59,8 @@ func (ctrl *GeolocationController) SetLocation(c *gin.Context) {
 }
 
 // GetLocation godoc
-// @Summary      Obtener ubicación del proveedor
-// @Description  Retorna la ubicación actual y radio de entrega del proveedor
+// @Summary      Obtener dirección del almacén
+// @Description  Retorna la dirección del almacén o sucursal registrada por el proveedor
 // @Tags         Geolocations
 // @Produce      json
 // @Security     BearerAuth
@@ -81,41 +82,6 @@ func (ctrl *GeolocationController) GetLocation(c *gin.Context) {
 	}
 
 	responses.SuccessResponse(c, http.StatusOK, "Ubicación obtenida exitosamente", result)
-}
-
-// CheckPoint godoc
-// @Summary      Verificar si un punto está dentro del radio de entrega
-// @Description  Calcula la distancia entre un punto dado y la ubicación del proveedor, y verifica si está dentro del radio
-// @Tags         Geolocations
-// @Accept       json
-// @Produce      json
-// @Security     BearerAuth
-// @Param        body  body      entities.CheckPointRequest  true  "Coordenadas del punto a verificar"
-// @Success      200   {object}  responses.APIResponse{data=entities.CheckPointResponse}
-// @Failure      400   {object}  responses.APIResponse
-// @Failure      401   {object}  responses.APIResponse
-// @Failure      404   {object}  responses.APIResponse
-// @Router       /api/v1/providers/location/check [post]
-func (ctrl *GeolocationController) CheckPoint(c *gin.Context) {
-	providerID, exists := c.Get("provider_id")
-	if !exists {
-		responses.ErrorResponse(c, http.StatusUnauthorized, "Proveedor no autenticado", nil)
-		return
-	}
-
-	var req entities.CheckPointRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		responses.ErrorResponse(c, http.StatusBadRequest, "Coordenadas inválidas", nil)
-		return
-	}
-
-	result, err := ctrl.useCase.IsPointInRadius(c.Request.Context(), providerID.(string), req.Lat, req.Lng)
-	if err != nil {
-		handleGeolocationError(c, err)
-		return
-	}
-
-	responses.SuccessResponse(c, http.StatusOK, "Verificación de punto completada", result)
 }
 
 func handleGeolocationError(c *gin.Context, err error) {
