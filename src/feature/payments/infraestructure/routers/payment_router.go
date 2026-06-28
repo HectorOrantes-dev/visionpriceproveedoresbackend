@@ -16,7 +16,7 @@ func SetupPaymentRoutes(router *gin.RouterGroup, controller *controllers.Payment
 	sub.Use(middleware.AuthMiddleware(jwtSecret, middleware.TokenTypeAccess))
 	sub.Use(middleware.CSRFMiddleware(csrfManager))
 	{
-		sub.POST("/checkout", middleware.RequireReauth(db), controller.CreateCheckout)
+		sub.POST("/checkout", middleware.RequireReauth(db), middleware.IdempotencyMiddleware(db), controller.CreateCheckout)
 	}
 
 	// Webhooks: public endpoints authenticated by the gateway's own signature.
