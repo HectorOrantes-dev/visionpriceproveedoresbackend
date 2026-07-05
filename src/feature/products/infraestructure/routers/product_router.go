@@ -17,6 +17,7 @@ func SetupProductRoutes(router *gin.RouterGroup, controller *controllers.Product
 	// read-only GETs pass through untouched.
 	products.Use(middleware.CSRFMiddleware(csrfManager))
 	{
+		products.POST("/upload-image", controller.UploadImage)
 		products.POST("", controller.CreateProduct)
 		products.GET("", controller.ListProducts)
 		products.GET("/:id", controller.GetProduct)

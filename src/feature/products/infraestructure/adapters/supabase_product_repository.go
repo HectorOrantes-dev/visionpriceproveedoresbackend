@@ -23,9 +23,9 @@ func NewSupabaseProductRepository(db *pgxpool.Pool) *SupabaseProductRepository {
 // Create inserts a new product into the database.
 func (r *SupabaseProductRepository) Create(ctx context.Context, product *entities.Product) (*entities.Product, error) {
 	query := `
-		INSERT INTO products (provider_id, name, sku, brand, price, unit, category, stock, status, description)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-		RETURNING id, provider_id, name, sku, brand, price, unit, category, stock, status, description, active, created_at, updated_at
+		INSERT INTO products (provider_id, name, sku, brand, price, unit, category, stock, status, description, image_url)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		RETURNING id, provider_id, name, sku, brand, price, unit, category, stock, status, description, image_url, active, created_at, updated_at
 	`
 
 	created := &entities.Product{}
@@ -40,6 +40,7 @@ func (r *SupabaseProductRepository) Create(ctx context.Context, product *entitie
 		product.Stock,
 		product.Status,
 		product.Description,
+		product.ImageURL,
 	).Scan(
 		&created.ID,
 		&created.ProviderID,
@@ -52,6 +53,7 @@ func (r *SupabaseProductRepository) Create(ctx context.Context, product *entitie
 		&created.Stock,
 		&created.Status,
 		&created.Description,
+		&created.ImageURL,
 		&created.Active,
 		&created.CreatedAt,
 		&created.UpdatedAt,
@@ -67,7 +69,7 @@ func (r *SupabaseProductRepository) Create(ctx context.Context, product *entitie
 // FindByID retrieves an active product by ID.
 func (r *SupabaseProductRepository) FindByID(ctx context.Context, productID uuid.UUID) (*entities.Product, error) {
 	query := `
-		SELECT id, provider_id, name, sku, brand, price, unit, category, stock, status, description, active, created_at, updated_at
+		SELECT id, provider_id, name, sku, brand, price, unit, category, stock, status, description, image_url, active, created_at, updated_at
 		FROM products
 		WHERE id = $1 AND active = TRUE
 	`
@@ -85,6 +87,7 @@ func (r *SupabaseProductRepository) FindByID(ctx context.Context, productID uuid
 		&product.Stock,
 		&product.Status,
 		&product.Description,
+		&product.ImageURL,
 		&product.Active,
 		&product.CreatedAt,
 		&product.UpdatedAt,
@@ -100,7 +103,7 @@ func (r *SupabaseProductRepository) FindByID(ctx context.Context, productID uuid
 // FindAllActive retrieves all active products for a provider.
 func (r *SupabaseProductRepository) FindAllActive(ctx context.Context, providerID uuid.UUID) ([]*entities.Product, error) {
 	query := `
-		SELECT id, provider_id, name, sku, brand, price, unit, category, stock, status, description, active, created_at, updated_at
+		SELECT id, provider_id, name, sku, brand, price, unit, category, stock, status, description, image_url, active, created_at, updated_at
 		FROM products
 		WHERE provider_id = $1 AND active = TRUE
 		ORDER BY created_at DESC
@@ -127,6 +130,7 @@ func (r *SupabaseProductRepository) FindAllActive(ctx context.Context, providerI
 			&product.Stock,
 			&product.Status,
 			&product.Description,
+			&product.ImageURL,
 			&product.Active,
 			&product.CreatedAt,
 			&product.UpdatedAt,
@@ -148,9 +152,9 @@ func (r *SupabaseProductRepository) Update(ctx context.Context, product *entitie
 	query := `
 		UPDATE products
 		SET name = $1, sku = $2, brand = $3, price = $4, unit = $5, category = $6,
-		    stock = $7, status = $8, description = $9, updated_at = NOW()
-		WHERE id = $10 AND active = TRUE
-		RETURNING id, provider_id, name, sku, brand, price, unit, category, stock, status, description, active, created_at, updated_at
+		    stock = $7, status = $8, description = $9, image_url = $10, updated_at = NOW()
+		WHERE id = $11 AND active = TRUE
+		RETURNING id, provider_id, name, sku, brand, price, unit, category, stock, status, description, image_url, active, created_at, updated_at
 	`
 
 	updated := &entities.Product{}
@@ -164,6 +168,7 @@ func (r *SupabaseProductRepository) Update(ctx context.Context, product *entitie
 		product.Stock,
 		product.Status,
 		product.Description,
+		product.ImageURL,
 		product.ID,
 	).Scan(
 		&updated.ID,
@@ -177,6 +182,7 @@ func (r *SupabaseProductRepository) Update(ctx context.Context, product *entitie
 		&updated.Stock,
 		&updated.Status,
 		&updated.Description,
+		&updated.ImageURL,
 		&updated.Active,
 		&updated.CreatedAt,
 		&updated.UpdatedAt,

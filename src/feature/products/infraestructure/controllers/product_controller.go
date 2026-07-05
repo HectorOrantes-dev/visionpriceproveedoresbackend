@@ -2,10 +2,17 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"net/http"
+	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 
+	"github.com/visionprice/proveedores-backend/src/core/storage"
 	domainErrors "github.com/visionprice/proveedores-backend/src/core/errors"
 	"github.com/visionprice/proveedores-backend/src/core/responses"
 	"github.com/visionprice/proveedores-backend/src/feature/products/application/product_usecase"
@@ -214,6 +221,89 @@ func (ctrl *ProductController) GetMetricsSummary(c *gin.Context) {
 func (ctrl *ProductController) GetTopProducts(c *gin.Context) {
 	// Stub: return empty list
 	responses.SuccessResponse(c, http.StatusOK, "Top productos obtenidos (stub)", []entities.TopProduct{})
+}
+
+// UploadImage godoc
+// @Summary      Subir imagen del producto
+// @Description  Sube una imagen para un material/producto a Cloudflare R2 y retorna la URL pública.
+// @Tags         Products
+// @Accept       multipart/form-data
+// @Produce      json
+// @Security     BearerAuth
+// @Param        file formData file true "Imagen a subir (máx 5MB, jpeg/png/webp)"
+// @Success      200  {object}  responses.APIResponse
+// @Failure      400  {object}  responses.APIResponse
+// @Failure      401  {object}  responses.APIResponse
+// @Failure      500  {object}  responses.APIResponse
+// @Router       /api/v1/products/upload-image [post]
+func (ctrl *ProductController) UploadImage(c *gin.Context) {
+	providerID, exists := c.Get("provider_id")
+	if !exists {
+		responses.ErrorResponse(c, http.StatusUnauthorized, "Proveedor no autenticado", nil)
+		return
+	}
+
+	fileHeader, err := c.FormFile("file")
+	if err != nil {
+		responses.ErrorResponse(c, http.StatusBadRequest, "No se proporcionó ningún archivo", nil)
+		return
+	}
+
+	// Validate file size (e.g. max 5MB)
+	const maxSize = 5 * 1024 * 1024
+	if fileHeader.Size > maxSize {
+		responses.ErrorResponse(c, http.StatusBadRequest, "El archivo excede el límite de 5MB", nil)
+		return
+	}
+
+	// Read file content
+	file, err := fileHeader.Open()
+	if err != nil {
+		responses.ErrorResponse(c, http.StatusInternalServerError, "Error al procesar el archivo", nil)
+		return
+	}
+	defer file.Close()
+
+	fileBytes, err := io.ReadAll(file)
+	if err != nil {
+		responses.ErrorResponse(c, http.StatusInternalServerError, "Error al leer el archivo", nil)
+		return
+	}
+
+	// Determine content type
+	contentType := http.DetectContentType(fileBytes)
+	if !strings.HasPrefix(contentType, "image/") {
+		responses.ErrorResponse(c, http.StatusBadRequest, "El archivo debe ser una imagen válida", nil)
+		return
+	}
+
+	ext := filepath.Ext(fileHeader.Filename)
+	if ext == "" {
+		// fallback extension based on content type
+		if strings.Contains(contentType, "png") {
+			ext = ".png"
+		} else if strings.Contains(contentType, "webp") {
+			ext = ".webp"
+		} else {
+			ext = ".jpg"
+		}
+	}
+
+	// Generate a unique filename using UUID and providerID for namespace
+	uniqueID := uuid.New().String()
+	filename := fmt.Sprintf("products/%s/%d-%s%s", providerID.(string), time.Now().Unix(), uniqueID[:8], ext)
+
+	// Upload to R2
+	url, err := storage.UploadImage(c.Request.Context(), fileBytes, filename, contentType)
+	if err != nil {
+		fmt.Printf("UploadImage error: %v\n", err)
+		responses.ErrorResponse(c, http.StatusInternalServerError, "Error al subir la imagen al servidor", nil)
+		return
+	}
+
+	responses.SuccessResponse(c, http.StatusOK, "Imagen subida exitosamente", gin.H{
+		"url": url,
+	})
 }
 
 func handleProductError(c *gin.Context, err error) {

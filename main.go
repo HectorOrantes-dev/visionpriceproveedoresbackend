@@ -14,6 +14,7 @@ import (
 	"github.com/visionprice/proveedores-backend/src/core/csrf"
 	"github.com/visionprice/proveedores-backend/src/core/database"
 	"github.com/visionprice/proveedores-backend/src/core/middleware"
+	"github.com/visionprice/proveedores-backend/src/core/storage"
 	"github.com/visionprice/proveedores-backend/src/core/validation"
 
 	adapters2FA "github.com/visionprice/proveedores-backend/src/feature/2FA/infraestructure/adapters"
@@ -58,6 +59,11 @@ import (
 func main() {
 	// Load configuration
 	cfg := config.Load()
+
+	// Initialize R2 storage
+	if err := storage.InitR2(); err != nil {
+		log.Printf("WARNING: failed to initialize R2 storage: %v", err)
+	}
 
 	// Initialize database connection
 	ctx := context.Background()

@@ -19,6 +19,7 @@ type Product struct {
 	Stock       int       `json:"stock"`
 	Status      string    `json:"status"`
 	Description *string   `json:"description,omitempty"`
+	ImageURL    *string   `json:"image_url,omitempty"`
 	Active      bool      `json:"active"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
@@ -36,6 +37,7 @@ type CreateProductRequest struct {
 	Stock       *int    `json:"stock,omitempty" binding:"omitempty,gte=0"`
 	Status      *string `json:"status,omitempty" binding:"omitempty,oneof=active draft inactive out_of_stock"`
 	Description *string `json:"description,omitempty" binding:"omitempty,max=2000,nohtml"`
+	ImageURL    *string `json:"image_url,omitempty" binding:"omitempty,url"`
 }
 
 // UpdateProductRequest is the DTO for updating a product.
@@ -49,6 +51,7 @@ type UpdateProductRequest struct {
 	Stock       *int     `json:"stock,omitempty" binding:"omitempty,gte=0"`
 	Status      *string  `json:"status,omitempty" binding:"omitempty,oneof=active draft inactive out_of_stock"`
 	Description *string  `json:"description,omitempty" binding:"omitempty,max=2000,nohtml"`
+	ImageURL    *string  `json:"image_url,omitempty" binding:"omitempty,url"`
 }
 
 // MetricsSummary is the stub DTO for provider metrics (HU_PROV_05).
