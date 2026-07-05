@@ -13,8 +13,9 @@ import (
 //
 // It reads two tables:
 //
-//	proveedores(id, nombre, latitud, longitud, activo)
-//	productos(id, proveedor_id, nombre, categoria, unidad, precio_unitario, rendimiento_m2, activo)
+//	providers(id, business_name, active)
+//	provider_locations(provider_id, lat, lng, delivery_radius_km)
+//	products(id, provider_id, name, category, unit, price, image_url, active)
 //
 // If your real columns differ, this adapter is the ONLY place to adjust the SQL.
 type SupabaseCatalogoRepository struct {
@@ -31,18 +32,19 @@ func NewSupabaseCatalogoRepository(db *pgxpool.Pool) *SupabaseCatalogoRepository
 // [-1,1] to avoid NaN from floating-point rounding on exact-same coordinates.
 const nearbyQuery = `
 	SELECT * FROM (
-		SELECT p.id AS producto_id, p.nombre, p.categoria, p.unidad,
-		       p.precio_unitario, p.rendimiento_m2,
-		       pr.id AS proveedor_id, pr.nombre AS proveedor_nombre,
+		SELECT p.id AS producto_id, p.name AS nombre, p.category AS categoria, p.unit AS unidad,
+		       p.price AS precio_unitario, 0.0::float8 AS rendimiento_m2, COALESCE(p.image_url, '') AS image_url,
+		       pr.id AS proveedor_id, pr.business_name AS proveedor_nombre,
 		       (6371 * acos(LEAST(1, GREATEST(-1,
-		          cos(radians($1)) * cos(radians(pr.latitud)) *
-		          cos(radians(pr.longitud) - radians($2)) +
-		          sin(radians($1)) * sin(radians(pr.latitud))
+		          cos(radians($1)) * cos(radians(pl.lat)) *
+		          cos(radians(pl.lng) - radians($2)) +
+		          sin(radians($1)) * sin(radians(pl.lat))
 		       )))) AS distancia_km
-		FROM productos p
-		JOIN proveedores pr ON pr.id = p.proveedor_id
-		WHERE p.activo AND pr.activo
-		  AND ($3 = '' OR p.categoria = $3)
+		FROM products p
+		JOIN providers pr ON pr.id = p.provider_id
+		JOIN provider_locations pl ON pl.provider_id = pr.id
+		WHERE p.active AND pr.active
+		  AND ($3 = '' OR p.category = $3)
 	) t
 	WHERE t.distancia_km <= $4
 	ORDER BY t.distancia_km
@@ -50,13 +52,13 @@ const nearbyQuery = `
 
 // byIDsQuery returns the same shape with distancia_km = 0 (no reference point).
 const byIDsQuery = `
-	SELECT p.id AS producto_id, p.nombre, p.categoria, p.unidad,
-	       p.precio_unitario, p.rendimiento_m2,
-	       pr.id AS proveedor_id, pr.nombre AS proveedor_nombre,
+	SELECT p.id AS producto_id, p.name AS nombre, p.category AS categoria, p.unit AS unidad,
+	       p.price AS precio_unitario, 0.0::float8 AS rendimiento_m2, COALESCE(p.image_url, '') AS image_url,
+	       pr.id AS proveedor_id, pr.business_name AS proveedor_nombre,
 	       0::float8 AS distancia_km
-	FROM productos p
-	JOIN proveedores pr ON pr.id = p.proveedor_id
-	WHERE p.activo AND pr.activo AND p.id = ANY($1)
+	FROM products p
+	JOIN providers pr ON pr.id = p.provider_id
+	WHERE p.active AND pr.active AND p.id = ANY($1)
 `
 
 // FindNearby returns active products within radioKm of (lat,lng).
@@ -70,13 +72,9 @@ func (r *SupabaseCatalogoRepository) FindNearby(ctx context.Context, lat, lng, r
 }
 
 // FindByIDs returns active products whose id is in ids.
-func (r *SupabaseCatalogoRepository) FindByIDs(ctx context.Context, ids []int) ([]entities.Producto, error) {
-	// Use int64 so the array encodes as bigint[] and matches the bigint id column.
-	arr := make([]int64, len(ids))
-	for i, v := range ids {
-		arr[i] = int64(v)
-	}
-	rows, err := r.db.Query(ctx, byIDsQuery, arr)
+func (r *SupabaseCatalogoRepository) FindByIDs(ctx context.Context, ids []string) ([]entities.Producto, error) {
+	// Send as a string array to match UUID column type.
+	rows, err := r.db.Query(ctx, byIDsQuery, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +90,7 @@ func scanProductos(rows pgx.Rows) ([]entities.Producto, error) {
 		var p entities.Producto
 		if err := rows.Scan(
 			&p.ProductoID, &p.Nombre, &p.Categoria, &p.Unidad,
-			&p.PrecioUnitario, &p.RendimientoM2,
+			&p.PrecioUnitario, &p.RendimientoM2, &p.ImageURL,
 			&p.Proveedor.ProveedorID, &p.Proveedor.Nombre, &p.Proveedor.DistanciaKm,
 		); err != nil {
 			return nil, err

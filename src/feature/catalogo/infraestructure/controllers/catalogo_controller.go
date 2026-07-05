@@ -58,18 +58,13 @@ func (ctrl *CatalogoController) ProductosPorIDs(c *gin.Context) {
 	}
 
 	parts := strings.Split(idsParam, ",")
-	ids := make([]int, 0, len(parts))
+	ids := make([]string, 0, len(parts))
 	for _, s := range parts {
 		s = strings.TrimSpace(s)
 		if s == "" {
 			continue
 		}
-		id, err := strconv.Atoi(s)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "El parámetro 'ids' debe ser una lista de enteros separados por comas"})
-			return
-		}
-		ids = append(ids, id)
+		ids = append(ids, s)
 	}
 
 	productos, err := ctrl.useCase.ProductosPorIDs(c.Request.Context(), ids)
