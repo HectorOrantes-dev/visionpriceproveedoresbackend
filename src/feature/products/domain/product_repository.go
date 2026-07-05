@@ -22,6 +22,10 @@ type ProductRepository interface {
 	// Update modifies an existing product.
 	Update(ctx context.Context, product *entities.Product) (*entities.Product, error)
 
+	// UpdateImageURL sets only the image_url of a product, scoped to its owner.
+	// Used by the background image upload so it does not overwrite other fields.
+	UpdateImageURL(ctx context.Context, providerID, productID uuid.UUID, imageURL string) error
+
 	// SoftDelete marks a product as inactive (logical deletion).
 	SoftDelete(ctx context.Context, productID uuid.UUID) error
 

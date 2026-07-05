@@ -195,6 +195,25 @@ func (r *SupabaseProductRepository) Update(ctx context.Context, product *entitie
 	return updated, nil
 }
 
+// UpdateImageURL sets only the image_url column for a product owned by the
+// given provider. The provider_id predicate is an IDOR defense so the async
+// upload can never attach an image to another provider's product.
+func (r *SupabaseProductRepository) UpdateImageURL(ctx context.Context, providerID, productID uuid.UUID, imageURL string) error {
+	const query = `
+		UPDATE products
+		SET image_url = $1, updated_at = NOW()
+		WHERE id = $2 AND provider_id = $3 AND active = TRUE
+	`
+	tag, err := r.db.Exec(ctx, query, imageURL, productID, providerID)
+	if err != nil {
+		return fmt.Errorf("failed to update image_url: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return fmt.Errorf("product not found for image update")
+	}
+	return nil
+}
+
 // CountActiveByProvider returns the number of active products for a provider.
 func (r *SupabaseProductRepository) CountActiveByProvider(ctx context.Context, providerID uuid.UUID) (int, error) {
 	const query = `SELECT COUNT(*) FROM products WHERE provider_id = $1 AND active = TRUE`
