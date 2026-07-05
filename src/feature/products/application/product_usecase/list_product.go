@@ -2,6 +2,7 @@ package product_usecase
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/google/uuid"
 
@@ -45,6 +46,9 @@ func (uc *ProductUseCase) ListProducts(ctx context.Context, providerID string) (
 
 	products, err := uc.repo.FindAllActive(ctx, pid)
 	if err != nil {
+		// Log the underlying DB error so the real cause is visible in the
+		// server logs; the client still gets a generic 500 message.
+		slog.Error("products: failed to list", "error", err, "provider_id", providerID)
 		return nil, domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al obtener productos")
 	}
 
