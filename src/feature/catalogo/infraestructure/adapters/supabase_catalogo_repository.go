@@ -33,7 +33,7 @@ func NewSupabaseCatalogoRepository(db *pgxpool.Pool) *SupabaseCatalogoRepository
 const nearbyQuery = `
 	SELECT * FROM (
 		SELECT p.id AS producto_id, p.name AS nombre, p.category AS categoria, p.unit AS unidad,
-		       p.price AS precio_unitario, 0.0::float8 AS rendimiento_m2, COALESCE(p.image_url, '') AS image_url,
+		       p.price AS precio_unitario, COALESCE(p.rendimiento_m2, 0) AS rendimiento_m2, COALESCE(p.image_url, '') AS image_url,
 		       pr.id AS proveedor_id, pr.business_name AS proveedor_nombre,
 		       (6371 * acos(LEAST(1, GREATEST(-1,
 		          cos(radians($1)) * cos(radians(pl.lat)) *

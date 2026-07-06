@@ -141,7 +141,9 @@ func main() {
 	}, rateLimiter)
 	dependenciesGeolocations.Init(v1, dbPool, cfg.JWTSecret)
 	dependenciesProfile.Init(v1, dbPool, cfg.JWTSecret)
-	dependenciesCatalogo.Init(v1, dbPool, cfg.MicroserviceAPIKey)
+	// Catalog microservice mounted at ROOT (not /api/v1) so the gateway reaches
+	// {base}/productos/cercanos and {base}/productos directly.
+	dependenciesCatalogo.Init(router.Group(""), dbPool, cfg.MicroserviceAPIKey)
 	dependenciesProducts.Init(v1, dbPool, csrfManager, subscriptionUseCase, cfg.JWTSecret)
 	dependenciesExtracciones.Init(v1, dbPool, subscriptionUseCase, cfg.JWTSecret)
 	dependenciesAdmin.Init(v1, dbPool, cfg.JWTSecret, cfg.JWTExpirationMinutes, rateLimiter)

@@ -46,6 +46,9 @@ func (uc *ProductUseCase) UpdateProduct(ctx context.Context, providerID string, 
 	if req.Category != nil {
 		existing.Category = *req.Category
 	}
+	if req.RendimientoM2 != nil {
+		existing.RendimientoM2 = *req.RendimientoM2
+	}
 	if req.SKU != nil {
 		existing.SKU = req.SKU
 	}
