@@ -31,6 +31,22 @@ type ProductRepository interface {
 
 	// CountActiveByProvider returns how many active products a provider has.
 	CountActiveByProvider(ctx context.Context, providerID uuid.UUID) (int, error)
+
+	// MetricsAggregate returns catalog aggregates for a provider: total inventory
+	// value (Σ price×stock), units in stock (Σ stock), average price and material count.
+	MetricsAggregate(ctx context.Context, providerID uuid.UUID) (inventoryValue float64, unitsInStock int, averagePrice float64, totalMaterials int, err error)
+
+	// CategoryDistribution returns the inventory value grouped by category
+	// (descending). The Share field is left at 0 for the caller to compute.
+	CategoryDistribution(ctx context.Context, providerID uuid.UUID) ([]entities.CategorySlice, error)
+
+	// MonthlyNewMaterials returns how many materials were created per month for the
+	// last 6 months (zero-filled), with a Spanish month label.
+	MonthlyNewMaterials(ctx context.Context, providerID uuid.UUID) ([]entities.MonthlyPoint, error)
+
+	// TopByInventoryValue returns the top materials by inventory value (price×stock).
+	// The Share field is left at 0 for the caller to compute.
+	TopByInventoryValue(ctx context.Context, providerID uuid.UUID, limit int) ([]entities.TopProduct, error)
 }
 
 // PlanLimitService is the narrow port (consumer-defined) the products feature

@@ -58,16 +58,34 @@ type UpdateProductRequest struct {
 	ImageURL      *string  `json:"image_url,omitempty" binding:"omitempty,url"`
 }
 
-// MetricsSummary is the stub DTO for provider metrics (HU_PROV_05).
+// MetricsSummary aggregates catalog/inventory metrics for a provider, computed
+// from the products table. There is no sales/orders data in the system, so these
+// reflect the current catalog (inventory value, stock, price, distribution).
 type MetricsSummary struct {
-	TotalBudgetAppearances int    `json:"total_budget_appearances"`
-	ContactClicks          int    `json:"contact_clicks"`
-	Period                 string `json:"period"`
+	InventoryValue float64         `json:"inventoryValue"` // Σ(price × stock) of active products
+	UnitsInStock   int             `json:"unitsInStock"`   // Σ(stock)
+	AveragePrice   float64         `json:"averagePrice"`   // AVG(price)
+	TotalMaterials int             `json:"totalMaterials"` // COUNT(active)
+	MonthlyNew     []MonthlyPoint  `json:"monthlyNew"`     // materials created per month (last 6)
+	Distribution   []CategorySlice `json:"distribution"`   // inventory value share by category
 }
 
-// TopProduct is the stub DTO for top quoted products (HU_PROV_05).
+// MonthlyPoint is one bar of the "materials created per month" chart.
+type MonthlyPoint struct {
+	Label string  `json:"label"`
+	Value float64 `json:"value"`
+}
+
+// CategorySlice is one slice of the category distribution donut.
+type CategorySlice struct {
+	Category string  `json:"category"`
+	Value    float64 `json:"value"`
+	Share    float64 `json:"share"` // percentage 0..100 of total inventory value
+}
+
+// TopProduct is a top material by inventory value (price × stock).
 type TopProduct struct {
-	ProductID  uuid.UUID `json:"product_id"`
-	Name       string    `json:"name"`
-	QuoteCount int       `json:"quote_count"`
+	Name   string  `json:"name"`
+	Amount float64 `json:"amount"` // inventory value of this material
+	Share  float64 `json:"share"`  // percentage 0..100 of total inventory value
 }

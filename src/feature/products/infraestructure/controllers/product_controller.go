@@ -198,16 +198,19 @@ func (ctrl *ProductController) DeleteProduct(c *gin.Context) {
 // @Failure      401     {object}  responses.APIResponse
 // @Router       /api/v1/metrics/summary [get]
 func (ctrl *ProductController) GetMetricsSummary(c *gin.Context) {
-	period := c.DefaultQuery("period", "month")
-
-	// Stub: return zeroed metrics
-	stub := entities.MetricsSummary{
-		TotalBudgetAppearances: 0,
-		ContactClicks:          0,
-		Period:                 period,
+	providerID, exists := c.Get("provider_id")
+	if !exists {
+		responses.ErrorResponse(c, http.StatusUnauthorized, "Proveedor no autenticado", nil)
+		return
 	}
 
-	responses.SuccessResponse(c, http.StatusOK, "Métricas obtenidas (stub)", stub)
+	summary, err := ctrl.useCase.GetMetricsSummary(c.Request.Context(), providerID.(string))
+	if err != nil {
+		handleProductError(c, err)
+		return
+	}
+
+	responses.SuccessResponse(c, http.StatusOK, "Métricas obtenidas exitosamente", summary)
 }
 
 // GetTopProducts godoc
@@ -221,8 +224,19 @@ func (ctrl *ProductController) GetMetricsSummary(c *gin.Context) {
 // @Failure      401     {object}  responses.APIResponse
 // @Router       /api/v1/metrics/top-products [get]
 func (ctrl *ProductController) GetTopProducts(c *gin.Context) {
-	// Stub: return empty list
-	responses.SuccessResponse(c, http.StatusOK, "Top productos obtenidos (stub)", []entities.TopProduct{})
+	providerID, exists := c.Get("provider_id")
+	if !exists {
+		responses.ErrorResponse(c, http.StatusUnauthorized, "Proveedor no autenticado", nil)
+		return
+	}
+
+	top, err := ctrl.useCase.GetTopProducts(c.Request.Context(), providerID.(string))
+	if err != nil {
+		handleProductError(c, err)
+		return
+	}
+
+	responses.SuccessResponse(c, http.StatusOK, "Top de materiales obtenido exitosamente", top)
 }
 
 // UploadImage godoc

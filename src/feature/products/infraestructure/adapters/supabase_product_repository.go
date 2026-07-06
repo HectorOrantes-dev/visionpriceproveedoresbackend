@@ -3,12 +3,16 @@ package adapters
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/visionprice/proveedores-backend/src/feature/products/domain/entities"
 )
+
+// spanishMonths maps a time.Month to its 3-letter Spanish abbreviation.
+var spanishMonths = [...]string{"", "Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"}
 
 // SupabaseProductRepository implements ProductRepository using PostgreSQL (Supabase).
 type SupabaseProductRepository struct {
@@ -229,6 +233,112 @@ func (r *SupabaseProductRepository) CountActiveByProvider(ctx context.Context, p
 		return 0, fmt.Errorf("failed to count products: %w", err)
 	}
 	return count, nil
+}
+
+// MetricsAggregate returns catalog aggregates for a provider.
+func (r *SupabaseProductRepository) MetricsAggregate(ctx context.Context, providerID uuid.UUID) (float64, int, float64, int, error) {
+	const query = `
+		SELECT
+			COALESCE(SUM(price * stock), 0),
+			COALESCE(SUM(stock), 0),
+			COALESCE(AVG(price), 0),
+			COUNT(*)
+		FROM products
+		WHERE provider_id = $1 AND active = TRUE
+	`
+	var inventoryValue, averagePrice float64
+	var unitsInStock, totalMaterials int
+	err := r.db.QueryRow(ctx, query, providerID).Scan(&inventoryValue, &unitsInStock, &averagePrice, &totalMaterials)
+	if err != nil {
+		return 0, 0, 0, 0, fmt.Errorf("failed to aggregate metrics: %w", err)
+	}
+	return inventoryValue, unitsInStock, averagePrice, totalMaterials, nil
+}
+
+// CategoryDistribution returns inventory value grouped by category (descending).
+func (r *SupabaseProductRepository) CategoryDistribution(ctx context.Context, providerID uuid.UUID) ([]entities.CategorySlice, error) {
+	const query = `
+		SELECT category, COALESCE(SUM(price * stock), 0) AS value
+		FROM products
+		WHERE provider_id = $1 AND active = TRUE
+		GROUP BY category
+		ORDER BY value DESC
+	`
+	rows, err := r.db.Query(ctx, query, providerID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query category distribution: %w", err)
+	}
+	defer rows.Close()
+
+	slices := []entities.CategorySlice{}
+	for rows.Next() {
+		var slice entities.CategorySlice
+		if err := rows.Scan(&slice.Category, &slice.Value); err != nil {
+			return nil, fmt.Errorf("failed to scan category slice: %w", err)
+		}
+		slices = append(slices, slice)
+	}
+	return slices, rows.Err()
+}
+
+// MonthlyNewMaterials returns materials created per month for the last 6 months (zero-filled).
+func (r *SupabaseProductRepository) MonthlyNewMaterials(ctx context.Context, providerID uuid.UUID) ([]entities.MonthlyPoint, error) {
+	const query = `
+		SELECT m.month, COALESCE(COUNT(p.id), 0)::float8 AS value
+		FROM generate_series(
+			date_trunc('month', NOW()) - INTERVAL '5 months',
+			date_trunc('month', NOW()),
+			INTERVAL '1 month'
+		) AS m(month)
+		LEFT JOIN products p
+			ON date_trunc('month', p.created_at) = m.month
+			AND p.provider_id = $1
+			AND p.active = TRUE
+		GROUP BY m.month
+		ORDER BY m.month
+	`
+	rows, err := r.db.Query(ctx, query, providerID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query monthly materials: %w", err)
+	}
+	defer rows.Close()
+
+	points := []entities.MonthlyPoint{}
+	for rows.Next() {
+		var month time.Time
+		var value float64
+		if err := rows.Scan(&month, &value); err != nil {
+			return nil, fmt.Errorf("failed to scan monthly point: %w", err)
+		}
+		points = append(points, entities.MonthlyPoint{Label: spanishMonths[month.Month()], Value: value})
+	}
+	return points, rows.Err()
+}
+
+// TopByInventoryValue returns the top materials by inventory value (price×stock).
+func (r *SupabaseProductRepository) TopByInventoryValue(ctx context.Context, providerID uuid.UUID, limit int) ([]entities.TopProduct, error) {
+	const query = `
+		SELECT name, COALESCE(price * stock, 0) AS amount
+		FROM products
+		WHERE provider_id = $1 AND active = TRUE
+		ORDER BY amount DESC
+		LIMIT $2
+	`
+	rows, err := r.db.Query(ctx, query, providerID, limit)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query top products: %w", err)
+	}
+	defer rows.Close()
+
+	products := []entities.TopProduct{}
+	for rows.Next() {
+		var product entities.TopProduct
+		if err := rows.Scan(&product.Name, &product.Amount); err != nil {
+			return nil, fmt.Errorf("failed to scan top product: %w", err)
+		}
+		products = append(products, product)
+	}
+	return products, rows.Err()
 }
 
 // SoftDelete marks a product as inactive.
