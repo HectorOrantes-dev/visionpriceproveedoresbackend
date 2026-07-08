@@ -53,7 +53,7 @@ const nearbyQuery = `
 // byIDsQuery returns the same shape with distancia_km = 0 (no reference point).
 const byIDsQuery = `
 	SELECT p.id AS producto_id, p.name AS nombre, p.category AS categoria, p.unit AS unidad,
-	       p.price AS precio_unitario, 0.0::float8 AS rendimiento_m2, COALESCE(p.image_url, '') AS image_url,
+	       p.price AS precio_unitario, COALESCE(p.rendimiento_m2, 0) AS rendimiento_m2, COALESCE(p.image_url, '') AS image_url,
 	       pr.id AS proveedor_id, pr.business_name AS proveedor_nombre,
 	       0::float8 AS distancia_km
 	FROM products p
