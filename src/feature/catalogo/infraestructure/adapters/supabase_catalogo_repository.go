@@ -28,7 +28,7 @@ func NewSupabaseCatalogoRepository(db *pgxpool.Pool) *SupabaseCatalogoRepository
 }
 
 // nearbyQuery filters by haversine distance. $1=lat, $2=lng, $3=categoria
-// (''=no filter), $4=radio_km. LEAST/GREATEST clamp the acos argument to
+// (”=no filter), $4=radio_km. LEAST/GREATEST clamp the acos argument to
 // [-1,1] to avoid NaN from floating-point rounding on exact-same coordinates.
 const nearbyQuery = `
 	SELECT * FROM (

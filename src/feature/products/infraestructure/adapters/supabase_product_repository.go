@@ -30,7 +30,7 @@ func (r *SupabaseProductRepository) Create(ctx context.Context, product *entitie
 		INSERT INTO products (provider_id, name, sku, brand, price, unit, category, stock, status, description, image_url, rendimiento_m2)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 		RETURNING id, provider_id, name, sku, brand, price, unit, category, stock, status, description, image_url, active, created_at, updated_at, rendimiento_m2
-	`
+`
 
 	created := &entities.Product{}
 	err := r.db.QueryRow(ctx, query,
@@ -76,7 +76,7 @@ func (r *SupabaseProductRepository) Create(ctx context.Context, product *entitie
 func (r *SupabaseProductRepository) FindByID(ctx context.Context, productID uuid.UUID) (*entities.Product, error) {
 	query := `
 		SELECT id, provider_id, name, sku, brand, price, unit, category, stock, status, description, image_url, active, created_at, updated_at, rendimiento_m2
-		FROM products
+	FROM products
 		WHERE id = $1 AND active = TRUE
 	`
 
@@ -111,7 +111,7 @@ func (r *SupabaseProductRepository) FindByID(ctx context.Context, productID uuid
 func (r *SupabaseProductRepository) FindAllActive(ctx context.Context, providerID uuid.UUID) ([]*entities.Product, error) {
 	query := `
 		SELECT id, provider_id, name, sku, brand, price, unit, category, stock, status, description, image_url, active, created_at, updated_at, rendimiento_m2
-		FROM products
+	FROM products
 		WHERE provider_id = $1 AND active = TRUE
 		ORDER BY created_at DESC
 	`
@@ -163,7 +163,7 @@ func (r *SupabaseProductRepository) Update(ctx context.Context, product *entitie
 		    stock = $7, status = $8, description = $9, image_url = $10, rendimiento_m2 = $11, updated_at = NOW()
 		WHERE id = $12 AND active = TRUE
 		RETURNING id, provider_id, name, sku, brand, price, unit, category, stock, status, description, image_url, active, created_at, updated_at, rendimiento_m2
-	`
+`
 
 	updated := &entities.Product{}
 	err := r.db.QueryRow(ctx, query,

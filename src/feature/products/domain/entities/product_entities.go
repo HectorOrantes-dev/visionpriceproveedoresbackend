@@ -16,7 +16,8 @@ type Product struct {
 	Price      float64   `json:"price"`
 	Unit       string    `json:"unit"`
 	Category   string    `json:"category"`
-	// RendimientoM2 is the m² covered by one unit (para conversión m²→cantidad).
+	// RendimientoM2 is the m² covered by one sales unit — whatever that unit is
+	// (caja, saco, cubeta, m³…). It's the single universal conversion factor.
 	RendimientoM2 float64   `json:"rendimiento_m2"`
 	Stock         int       `json:"stock"`
 	Status        string    `json:"status"`
