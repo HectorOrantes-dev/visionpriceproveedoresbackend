@@ -73,7 +73,7 @@ func (r *SupabaseCatalogoRepository) FindNearby(ctx context.Context, lat, lng, r
 }
 
 // FindByIDs returns active products whose id is in ids.
-func (r *SupabaseCatalogoRepository) FindByIDs(ctx context.Context, ids []int64) ([]entities.Producto, error) {
+func (r *SupabaseCatalogoRepository) FindByIDs(ctx context.Context, ids []string) ([]entities.Producto, error) {
 	rows, err := r.db.Query(ctx, byIDsQuery, ids)
 	if err != nil {
 		return nil, err
