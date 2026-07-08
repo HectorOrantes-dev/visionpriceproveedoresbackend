@@ -30,6 +30,8 @@ func (uc *GeolocationUseCase) SetLocation(ctx context.Context, providerID string
 	location := &entities.ProviderLocation{
 		ProviderID: pid,
 		Address:    req.Address,
+		Lat:        req.Lat,
+		Lng:        req.Lng,
 	}
 
 	result, err := uc.repo.UpsertLocation(ctx, location)

@@ -23,21 +23,25 @@ func NewSupabaseGeolocationRepository(db *pgxpool.Pool) *SupabaseGeolocationRepo
 // UpsertLocation creates or updates the provider's warehouse address.
 func (r *SupabaseGeolocationRepository) UpsertLocation(ctx context.Context, location *entities.ProviderLocation) (*entities.ProviderLocation, error) {
 	query := `
-		INSERT INTO provider_locations (provider_id, address, updated_at)
-		VALUES ($1, $2, NOW())
+		INSERT INTO provider_locations (provider_id, address, lat, lng, updated_at)
+		VALUES ($1, $2, $3, $4, NOW())
 		ON CONFLICT (provider_id)
-		DO UPDATE SET address = $2, updated_at = NOW()
-		RETURNING id, provider_id, address, updated_at
+		DO UPDATE SET address = $2, lat = $3, lng = $4, updated_at = NOW()
+		RETURNING id, provider_id, address, lat, lng, updated_at
 	`
 
 	result := &entities.ProviderLocation{}
 	err := r.db.QueryRow(ctx, query,
 		location.ProviderID,
 		location.Address,
+		location.Lat,
+		location.Lng,
 	).Scan(
 		&result.ID,
 		&result.ProviderID,
 		&result.Address,
+		&result.Lat,
+		&result.Lng,
 		&result.UpdatedAt,
 	)
 
@@ -51,7 +55,7 @@ func (r *SupabaseGeolocationRepository) UpsertLocation(ctx context.Context, loca
 // GetLocation retrieves the provider's warehouse address.
 func (r *SupabaseGeolocationRepository) GetLocation(ctx context.Context, providerID uuid.UUID) (*entities.ProviderLocation, error) {
 	query := `
-		SELECT id, provider_id, address, updated_at
+		SELECT id, provider_id, address, lat, lng, updated_at
 		FROM provider_locations
 		WHERE provider_id = $1
 	`
@@ -61,6 +65,8 @@ func (r *SupabaseGeolocationRepository) GetLocation(ctx context.Context, provide
 		&location.ID,
 		&location.ProviderID,
 		&location.Address,
+		&location.Lat,
+		&location.Lng,
 		&location.UpdatedAt,
 	)
 
