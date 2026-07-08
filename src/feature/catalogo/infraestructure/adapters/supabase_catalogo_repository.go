@@ -39,7 +39,7 @@ const nearbyQuery = `
 		          cos(radians($1)) * cos(radians(pl.lat)) *
 		          cos(radians(pl.lng) - radians($2)) +
 		          sin(radians($1)) * sin(radians(pl.lat))
-		       )))) AS distancia_km
+		       )))) AS distancia_km, pl.lat, pl.lng
 		FROM products p
 		JOIN providers pr ON pr.id = p.provider_id
 		JOIN provider_locations pl ON pl.provider_id = pr.id
@@ -55,9 +55,10 @@ const byIDsQuery = `
 	SELECT p.id AS producto_id, p.name AS nombre, p.category AS categoria, p.unit AS unidad,
 	       p.price AS precio_unitario, COALESCE(p.rendimiento_m2, 0) AS rendimiento_m2, COALESCE(p.image_url, '') AS image_url,
 	       pr.id AS proveedor_id, pr.business_name AS proveedor_nombre,
-	       0::float8 AS distancia_km
+	       0::float8 AS distancia_km, pl.lat, pl.lng
 	FROM products p
 	JOIN providers pr ON pr.id = p.provider_id
+	LEFT JOIN provider_locations pl ON pl.provider_id = pr.id
 	WHERE p.active AND pr.active AND p.id = ANY($1)
 `
 
@@ -91,6 +92,7 @@ func scanProductos(rows pgx.Rows) ([]entities.Producto, error) {
 			&p.ProductoID, &p.Nombre, &p.Categoria, &p.Unidad,
 			&p.PrecioUnitario, &p.RendimientoM2, &p.ImageURL,
 			&p.Proveedor.ProveedorID, &p.Proveedor.Nombre, &p.Proveedor.DistanciaKm,
+			&p.Proveedor.Lat, &p.Proveedor.Lng,
 		); err != nil {
 			return nil, err
 		}

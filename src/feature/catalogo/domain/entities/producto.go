@@ -2,9 +2,11 @@ package entities
 
 // Proveedor is the supplier data embedded in each product, as the gateway expects.
 type Proveedor struct {
-	ProveedorID int64   `json:"proveedor_id"`
-	Nombre      string  `json:"nombre"`
-	DistanciaKm float64 `json:"distancia_km"`
+	ProveedorID int64    `json:"proveedor_id"`
+	Nombre      string   `json:"nombre"`
+	DistanciaKm float64  `json:"distancia_km"`
+	Lat         *float64 `json:"lat"`
+	Lng         *float64 `json:"lng"`
 }
 
 // Producto is the catalog product shape returned to the gateway.
