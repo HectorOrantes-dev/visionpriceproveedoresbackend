@@ -16,5 +16,5 @@ type CatalogoRepository interface {
 
 	// FindByIDs returns active products whose id is in ids. distancia_km is 0
 	// (no reference point). Returns an empty slice (never nil) when none match.
-	FindByIDs(ctx context.Context, ids []string) ([]entities.Producto, error)
+	FindByIDs(ctx context.Context, ids []int64) ([]entities.Producto, error)
 }

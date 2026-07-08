@@ -23,7 +23,7 @@ func (uc *CatalogoUseCase) ProductosCercanos(ctx context.Context, lat, lng, radi
 }
 
 // ProductosPorIDs returns products by their ids (for price recalculation).
-func (uc *CatalogoUseCase) ProductosPorIDs(ctx context.Context, ids []string) ([]entities.Producto, error) {
+func (uc *CatalogoUseCase) ProductosPorIDs(ctx context.Context, ids []int64) ([]entities.Producto, error) {
 	if len(ids) == 0 {
 		return []entities.Producto{}, nil
 	}

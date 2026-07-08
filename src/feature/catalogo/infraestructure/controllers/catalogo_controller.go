@@ -58,13 +58,15 @@ func (ctrl *CatalogoController) ProductosPorIDs(c *gin.Context) {
 	}
 
 	parts := strings.Split(idsParam, ",")
-	ids := make([]string, 0, len(parts))
+	ids := make([]int64, 0, len(parts))
 	for _, s := range parts {
 		s = strings.TrimSpace(s)
 		if s == "" {
 			continue
 		}
-		ids = append(ids, s)
+		if id, err := strconv.ParseInt(s, 10, 64); err == nil {
+			ids = append(ids, id)
+		}
 	}
 
 	productos, err := ctrl.useCase.ProductosPorIDs(c.Request.Context(), ids)
