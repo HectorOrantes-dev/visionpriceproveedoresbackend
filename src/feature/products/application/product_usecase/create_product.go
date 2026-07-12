@@ -3,6 +3,7 @@ package product_usecase
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -46,20 +47,35 @@ func (uc *ProductUseCase) CreateProduct(ctx context.Context, providerID string, 
 	if req.RendimientoM2 != nil {
 		rendimientoM2 = *req.RendimientoM2
 	}
+	piezaLargoM := 0.0
+	if req.PiezaLargoM != nil {
+		piezaLargoM = *req.PiezaLargoM
+	}
+	piezaAnchoM := 0.0
+	if req.PiezaAnchoM != nil {
+		piezaAnchoM = *req.PiezaAnchoM
+	}
+	piezasPorPaquete := 0
+	if req.PiezasPorPaquete != nil {
+		piezasPorPaquete = *req.PiezasPorPaquete
+	}
 
 	product := &entities.Product{
-		ProviderID:    pid,
-		Name:          req.Name,
-		SKU:           req.SKU,
-		Brand:         req.Brand,
-		Price:         req.Price,
-		Unit:          req.Unit,
-		Category:      req.Category,
-		RendimientoM2: rendimientoM2,
-		Stock:         stock,
-		Status:        status,
-		Description:   req.Description,
-		Active:        true,
+		ProviderID:       pid,
+		Name:             req.Name,
+		SKU:              req.SKU,
+		Brand:            req.Brand,
+		Price:            req.Price,
+		Unit:             req.Unit,
+		Category:         strings.ToLower(strings.TrimSpace(req.Category)),
+		RendimientoM2:    rendimientoM2,
+		PiezaLargoM:      piezaLargoM,
+		PiezaAnchoM:      piezaAnchoM,
+		PiezasPorPaquete: piezasPorPaquete,
+		Stock:            stock,
+		Status:           status,
+		Description:      req.Description,
+		Active:           true,
 	}
 
 	created, err := uc.repo.Create(ctx, product)

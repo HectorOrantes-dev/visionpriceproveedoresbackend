@@ -2,6 +2,7 @@ package product_usecase
 
 import (
 	"context"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -44,10 +45,19 @@ func (uc *ProductUseCase) UpdateProduct(ctx context.Context, providerID string, 
 		existing.Unit = *req.Unit
 	}
 	if req.Category != nil {
-		existing.Category = *req.Category
+		existing.Category = strings.ToLower(strings.TrimSpace(*req.Category))
 	}
 	if req.RendimientoM2 != nil {
 		existing.RendimientoM2 = *req.RendimientoM2
+	}
+	if req.PiezaLargoM != nil {
+		existing.PiezaLargoM = *req.PiezaLargoM
+	}
+	if req.PiezaAnchoM != nil {
+		existing.PiezaAnchoM = *req.PiezaAnchoM
+	}
+	if req.PiezasPorPaquete != nil {
+		existing.PiezasPorPaquete = *req.PiezasPorPaquete
 	}
 	if req.SKU != nil {
 		existing.SKU = req.SKU
