@@ -140,7 +140,7 @@ func main() {
 		FromName:  cfg.BrevoFromName,
 	}, rateLimiter)
 	dependenciesGeolocations.Init(v1, dbPool, cfg.JWTSecret)
-	dependenciesProfile.Init(v1, dbPool, cfg.JWTSecret)
+	dependenciesProfile.Init(v1, dbPool, csrfManager, cfg.JWTSecret)
 	// Catalog microservice mounted at ROOT (not /api/v1) so the gateway reaches
 	// {base}/productos/cercanos and {base}/productos directly.
 	dependenciesCatalogo.Init(router.Group(""), dbPool, cfg.MicroserviceAPIKey)
