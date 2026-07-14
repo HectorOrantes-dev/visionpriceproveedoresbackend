@@ -62,7 +62,9 @@ const nearbyQuery = `
 // (empty list) instead of a 500.
 const byIDsQuery = `
 	SELECT p.id AS producto_id, p.name AS nombre, p.category AS categoria, p.unit AS unidad,
-	       p.price AS precio_unitario, COALESCE(p.rendimiento_m2, 0) AS rendimiento_m2, COALESCE(p.image_url, '') AS image_url,
+	       p.price AS precio_unitario, COALESCE(p.rendimiento_m2, 0) AS rendimiento_m2,
+	       COALESCE(p.pieza_largo_m, 0) AS pieza_largo_m, COALESCE(p.pieza_ancho_m, 0) AS pieza_ancho_m,
+	       COALESCE(p.piezas_por_paquete, 0) AS piezas_por_paquete, COALESCE(p.image_url, '') AS image_url,
 	       pr.id AS proveedor_id, pr.business_name AS proveedor_nombre,
 	       0::float8 AS distancia_km, pl.lat, pl.lng
 	FROM products p

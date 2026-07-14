@@ -75,3 +75,12 @@ Thumbs.db
 .idea/
 *.swp
 *.swovisionpriceproveedoresbackend
+
+# ==========================================
+# GRAPHIFY (mapa/grafo del proyecto — local, no subir)
+# ==========================================
+.graphify/
+.graphifyignore
+*.graphify
+graphify.db
+graphify.json
