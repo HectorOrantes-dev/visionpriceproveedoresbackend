@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log/slog"
 	"net/http"
 	"strconv"
 	"strings"
@@ -43,6 +44,7 @@ func (ctrl *CatalogoController) ProductosCercanos(c *gin.Context) {
 
 	productos, err := ctrl.useCase.ProductosCercanos(c.Request.Context(), lat, lng, radioKm, categoria)
 	if err != nil {
+		slog.Error("catalogo: productos cercanos falló", "error", err, "lat", lat, "lng", lng, "categoria", categoria)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al consultar productos cercanos"})
 		return
 	}
@@ -68,6 +70,7 @@ func (ctrl *CatalogoController) ProductosPorIDs(c *gin.Context) {
 
 	productos, err := ctrl.useCase.ProductosPorIDs(c.Request.Context(), ids)
 	if err != nil {
+		slog.Error("catalogo: productos por ids falló", "error", err, "ids", ids)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al consultar productos"})
 		return
 	}

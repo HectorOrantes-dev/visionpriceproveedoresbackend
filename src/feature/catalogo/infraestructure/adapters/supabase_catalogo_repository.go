@@ -2,6 +2,7 @@ package adapters
 
 import (
 	"context"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -28,8 +29,10 @@ func NewSupabaseCatalogoRepository(db *pgxpool.Pool) *SupabaseCatalogoRepository
 }
 
 // nearbyQuery filters by haversine distance. $1=lat, $2=lng, $3=categoria
-// (”=no filter), $4=radio_km. LEAST/GREATEST clamp the acos argument to
-// [-1,1] to avoid NaN from floating-point rounding on exact-same coordinates.
+// patterns (text[]; empty/NULL = no filter), $4=radio_km. LEAST/GREATEST clamp
+// the acos argument to [-1,1] to avoid NaN from floating-point rounding on
+// exact-same coordinates. The category filter uses ILIKE ANY so a provider whose
+// category reads "Pintura vinílica" still matches the item's "pintura".
 const nearbyQuery = `
 	SELECT * FROM (
 		SELECT p.id AS producto_id, p.name AS nombre, p.category AS categoria, p.unit AS unidad,
@@ -44,13 +47,17 @@ const nearbyQuery = `
 		JOIN providers pr ON pr.id = p.provider_id
 		JOIN provider_locations pl ON pl.provider_id = pr.id
 		WHERE p.active AND pr.active
-		  AND ($3 = '' OR p.category = $3)
+		  AND (COALESCE(cardinality($3::text[]), 0) = 0 OR p.category ILIKE ANY($3))
 	) t
 	WHERE t.distancia_km <= $4
 	ORDER BY t.distancia_km
 `
 
 // byIDsQuery returns the same shape with distancia_km = 0 (no reference point).
+// p.id is a uuid column and $1 arrives as text[]; we compare p.id::text so
+// Postgres doesn't error with "operator does not exist: uuid = text". lower()
+// makes it case-insensitive, and an id that doesn't exist just yields no rows
+// (empty list) instead of a 500.
 const byIDsQuery = `
 	SELECT p.id AS producto_id, p.name AS nombre, p.category AS categoria, p.unit AS unidad,
 	       p.price AS precio_unitario, COALESCE(p.rendimiento_m2, 0) AS rendimiento_m2, COALESCE(p.image_url, '') AS image_url,
@@ -59,12 +66,13 @@ const byIDsQuery = `
 	FROM products p
 	JOIN providers pr ON pr.id = p.provider_id
 	LEFT JOIN provider_locations pl ON pl.provider_id = pr.id
-	WHERE p.active AND pr.active AND p.id = ANY($1)
+	WHERE p.active AND pr.active AND lower(p.id::text) = ANY($1)
 `
 
-// FindNearby returns active products within radioKm of (lat,lng).
-func (r *SupabaseCatalogoRepository) FindNearby(ctx context.Context, lat, lng, radioKm float64, categoria string) ([]entities.Producto, error) {
-	rows, err := r.db.Query(ctx, nearbyQuery, lat, lng, categoria, radioKm)
+// FindNearby returns active products within radioKm of (lat,lng), optionally
+// restricted to the given ILIKE category patterns (nil/empty = no filter).
+func (r *SupabaseCatalogoRepository) FindNearby(ctx context.Context, lat, lng, radioKm float64, categoriaPatterns []string) ([]entities.Producto, error) {
+	rows, err := r.db.Query(ctx, nearbyQuery, lat, lng, categoriaPatterns, radioKm)
 	if err != nil {
 		return nil, err
 	}
@@ -72,9 +80,17 @@ func (r *SupabaseCatalogoRepository) FindNearby(ctx context.Context, lat, lng, r
 	return scanProductos(rows)
 }
 
-// FindByIDs returns active products whose id is in ids.
+// FindByIDs returns active products whose id is in ids. IDs are lowercased to
+// match lower(p.id::text) in the query (uuid::text is already lowercase).
 func (r *SupabaseCatalogoRepository) FindByIDs(ctx context.Context, ids []string) ([]entities.Producto, error) {
-	rows, err := r.db.Query(ctx, byIDsQuery, ids)
+	norm := make([]string, 0, len(ids))
+	for _, id := range ids {
+		id = strings.ToLower(strings.TrimSpace(id))
+		if id != "" {
+			norm = append(norm, id)
+		}
+	}
+	rows, err := r.db.Query(ctx, byIDsQuery, norm)
 	if err != nil {
 		return nil, err
 	}

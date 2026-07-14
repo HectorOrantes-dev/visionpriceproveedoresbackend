@@ -17,9 +17,13 @@ func NewCatalogoUseCase(repo domain.CatalogoRepository) *CatalogoUseCase {
 	return &CatalogoUseCase{repo: repo}
 }
 
-// ProductosCercanos returns products near a point within a radius.
+// ProductosCercanos returns products near a point within a radius. `categoria`
+// may carry one or several canonical categories (comma-separated) sent by the
+// app for the item being quoted; we expand them to the supplier-category
+// synonyms so only providers that carry that material are returned.
 func (uc *CatalogoUseCase) ProductosCercanos(ctx context.Context, lat, lng, radioKm float64, categoria string) ([]entities.Producto, error) {
-	return uc.repo.FindNearby(ctx, lat, lng, radioKm, categoria)
+	patrones := domain.ExpandCategorias(categoria)
+	return uc.repo.FindNearby(ctx, lat, lng, radioKm, patrones)
 }
 
 // ProductosPorIDs returns products by their ids (for price recalculation).
