@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -322,20 +321,21 @@ func (ctrl *ProductController) UploadImage(c *gin.Context) {
 	})
 }
 
-// UploadProductImageAsync godoc
-// @Summary      Adjuntar imagen a un producto (en segundo plano)
-// @Description  Recibe la imagen de un producto ya creado, responde 202 de inmediato y sube el archivo a R2 en segundo plano, adjuntando la URL al producto cuando termina.
+// UploadProductImage godoc
+// @Summary      Adjuntar imagen a un producto
+// @Description  Recibe la imagen de un producto ya creado, la sube a R2 y adjunta la URL pública al producto antes de responder.
 // @Tags         Products
 // @Accept       multipart/form-data
 // @Produce      json
 // @Security     BearerAuth
 // @Param        id   path      string  true  "ID del producto"
 // @Param        file formData  file    true  "Imagen a subir (máx 5MB, jpeg/png/webp)"
-// @Success      202  {object}  responses.APIResponse
+// @Success      200  {object}  responses.APIResponse
 // @Failure      400  {object}  responses.APIResponse
 // @Failure      401  {object}  responses.APIResponse
+// @Failure      500  {object}  responses.APIResponse
 // @Router       /api/v1/products/{id}/image [post]
-func (ctrl *ProductController) UploadProductImageAsync(c *gin.Context) {
+func (ctrl *ProductController) UploadProductImage(c *gin.Context) {
 	providerID, exists := c.Get("provider_id")
 	if !exists {
 		responses.ErrorResponse(c, http.StatusUnauthorized, "Proveedor no autenticado", nil)
@@ -344,8 +344,6 @@ func (ctrl *ProductController) UploadProductImageAsync(c *gin.Context) {
 
 	productID := c.Param("id")
 
-	// Validate the file synchronously (fast, in-request) so the client gets a
-	// clear 400 for bad input. The slow R2 upload happens after we respond.
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
 		responses.ErrorResponse(c, http.StatusBadRequest, "No se proporcionó ningún archivo", nil)
@@ -365,8 +363,6 @@ func (ctrl *ProductController) UploadProductImageAsync(c *gin.Context) {
 	}
 	defer file.Close()
 
-	// Read the bytes into memory now: the multipart file is tied to the request
-	// and is no longer readable once this handler returns and the goroutine runs.
 	fileBytes, err := io.ReadAll(file)
 	if err != nil {
 		responses.ErrorResponse(c, http.StatusInternalServerError, "Error al leer el archivo", nil)
@@ -395,26 +391,22 @@ func (ctrl *ProductController) UploadProductImageAsync(c *gin.Context) {
 
 	pid := providerID.(string)
 
-	// Respond immediately; the client does not wait for R2.
-	responses.SuccessResponse(c, http.StatusAccepted, "Imagen recibida, se está procesando", nil)
+	url, err := storage.UploadImage(c.Request.Context(), fileBytes, filename, contentType)
+	if err != nil {
+		slog.Error("products: image upload failed", "error", err, "provider_id", pid, "product_id", productID)
+		responses.ErrorResponse(c, http.StatusInternalServerError, "Error al subir la imagen al servidor", nil)
+		return
+	}
 
-	// Upload to R2 and attach the URL in the background. We use a fresh context
-	// (context.Background) because the request context is cancelled the moment
-	// this handler returns.
-	go func() {
-		bgCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		defer cancel()
+	if err := ctrl.useCase.AttachImage(c.Request.Context(), pid, productID, url); err != nil {
+		slog.Error("products: failed to attach image url", "error", err, "provider_id", pid, "product_id", productID)
+		handleProductError(c, err)
+		return
+	}
 
-		url, err := storage.UploadImage(bgCtx, fileBytes, filename, contentType)
-		if err != nil {
-			slog.Error("products: background image upload failed", "error", err, "provider_id", pid, "product_id", productID)
-			return
-		}
-
-		if err := ctrl.useCase.AttachImage(bgCtx, pid, productID, url); err != nil {
-			slog.Error("products: failed to attach image url", "error", err, "provider_id", pid, "product_id", productID)
-		}
-	}()
+	responses.SuccessResponse(c, http.StatusOK, "Imagen subida exitosamente", gin.H{
+		"url": url,
+	})
 }
 
 func handleProductError(c *gin.Context, err error) {

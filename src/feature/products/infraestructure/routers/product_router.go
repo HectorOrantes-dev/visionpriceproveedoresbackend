@@ -22,9 +22,10 @@ func SetupProductRoutes(router *gin.RouterGroup, controller *controllers.Product
 		products.GET("", controller.ListProducts)
 		products.GET("/:id", controller.GetProduct)
 		products.PUT("/:id", controller.UpdateProduct)
-		// Background image upload for an already-created product: responds 202
-		// and pushes to R2 in a goroutine so the create flow is not blocked.
-		products.POST("/:id/image", controller.UploadProductImageAsync)
+		// Image upload for an already-created product: uploads to R2 and attaches
+		// the URL synchronously before responding, so the client always knows the
+		// final image_url once this call succeeds.
+		products.POST("/:id/image", controller.UploadProductImage)
 		// Deleting a product is a sensitive action: require step-up re-authentication.
 		products.DELETE("/:id", middleware.RequireReauth(db), controller.DeleteProduct)
 	}
