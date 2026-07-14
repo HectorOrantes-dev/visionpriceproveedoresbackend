@@ -36,7 +36,9 @@ func NewSupabaseCatalogoRepository(db *pgxpool.Pool) *SupabaseCatalogoRepository
 const nearbyQuery = `
 	SELECT * FROM (
 		SELECT p.id AS producto_id, p.name AS nombre, p.category AS categoria, p.unit AS unidad,
-		       p.price AS precio_unitario, COALESCE(p.rendimiento_m2, 0) AS rendimiento_m2, COALESCE(p.image_url, '') AS image_url,
+		       p.price AS precio_unitario, COALESCE(p.rendimiento_m2, 0) AS rendimiento_m2,
+		       COALESCE(p.pieza_largo_m, 0) AS pieza_largo_m, COALESCE(p.pieza_ancho_m, 0) AS pieza_ancho_m,
+		       COALESCE(p.piezas_por_paquete, 0) AS piezas_por_paquete, COALESCE(p.image_url, '') AS image_url,
 		       pr.id AS proveedor_id, pr.business_name AS proveedor_nombre,
 		       (6371 * acos(LEAST(1, GREATEST(-1,
 		          cos(radians($1)) * cos(radians(pl.lat)) *
@@ -106,7 +108,7 @@ func scanProductos(rows pgx.Rows) ([]entities.Producto, error) {
 		var p entities.Producto
 		if err := rows.Scan(
 			&p.ProductoID, &p.Nombre, &p.Categoria, &p.Unidad,
-			&p.PrecioUnitario, &p.RendimientoM2, &p.ImageURL,
+			&p.PrecioUnitario, &p.RendimientoM2, &p.PiezaLargoM, &p.PiezaAnchoM, &p.PiezasPorPaquete, &p.ImageURL,
 			&p.Proveedor.ProveedorID, &p.Proveedor.Nombre, &p.Proveedor.DistanciaKm,
 			&p.Proveedor.Lat, &p.Proveedor.Lng,
 		); err != nil {
