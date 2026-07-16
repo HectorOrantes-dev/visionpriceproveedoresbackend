@@ -23,6 +23,9 @@ var sinonimos = map[string][]string{
 	"piso":              {"piso", "loseta", "losa", "ceramica", "porcelanato", "porcelanico"},
 	"azulejo":           {"azulejo", "mosaico", "revestimiento", "talavera"},
 	"zoclo":             {"zoclo", "zocalo", "rodapie"},
+	"cruceta":           {"cruceta", "crucetas", "separador", "espaciador", "nivelador"},
+	"pegazulejo":        {"pegazulejo", "pega azulejo", "pegazulejos", "adhesivo", "cemento cola", "mortero"},
+	"boquillado":        {"boquillado", "boquilla", "boquillas", "junta", "fragua"},
 }
 
 // ExpandCategorias toma el valor crudo del parámetro `categoria` (una o varias

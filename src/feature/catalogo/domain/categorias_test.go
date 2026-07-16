@@ -27,6 +27,21 @@ func TestExpandCategorias(t *testing.T) {
 			},
 		},
 		{"categoria desconocida usa el termino tal cual", "electricidad", []string{"%electricidad%"}},
+		{
+			"cruceta",
+			"cruceta",
+			[]string{"%cruceta%", "%crucetas%", "%separador%", "%espaciador%", "%nivelador%"},
+		},
+		{
+			"pegazulejo",
+			"pegazulejo",
+			[]string{"%pegazulejo%", "%pega azulejo%", "%pegazulejos%", "%adhesivo%", "%cemento cola%", "%mortero%"},
+		},
+		{
+			"boquillado",
+			"boquillado",
+			[]string{"%boquillado%", "%boquilla%", "%boquillas%", "%junta%", "%fragua%"},
+		},
 	}
 
 	for _, c := range cases {
