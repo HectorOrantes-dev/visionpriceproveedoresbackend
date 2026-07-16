@@ -25,7 +25,7 @@ var sinonimos = map[string][]string{
 	"zoclo":             {"zoclo", "zocalo", "rodapie"},
 	"cruceta":           {"cruceta", "crucetas", "separador", "espaciador", "nivelador"},
 	"pegazulejo":        {"pegazulejo", "pega azulejo", "pegazulejos", "adhesivo", "cemento cola", "mortero"},
-	"boquillado":        {"boquillado", "boquilla", "boquillas", "junta", "fragua"},
+	"emboquillado":      {"emboquillado", "boquillado", "boquilla", "boquillas", "junta", "fragua"},
 }
 
 // ExpandCategorias toma el valor crudo del parámetro `categoria` (una o varias

@@ -38,9 +38,9 @@ func TestExpandCategorias(t *testing.T) {
 			[]string{"%pegazulejo%", "%pega azulejo%", "%pegazulejos%", "%adhesivo%", "%cemento cola%", "%mortero%"},
 		},
 		{
-			"boquillado",
-			"boquillado",
-			[]string{"%boquillado%", "%boquilla%", "%boquillas%", "%junta%", "%fragua%"},
+			"emboquillado",
+			"emboquillado",
+			[]string{"%emboquillado%", "%boquillado%", "%boquilla%", "%boquillas%", "%junta%", "%fragua%"},
 		},
 	}
 
