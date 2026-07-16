@@ -75,6 +75,19 @@ func (uc *ProductUseCase) UpdateProduct(ctx context.Context, providerID string, 
 		existing.Description = req.Description
 	}
 
+	// Solo se valida el rol de cálculo si el request toca alguno de los campos
+	// que esas reglas exigen (o la categoría). Así un producto viejo que ya
+	// tenía datos incompletos se puede seguir editando en campos ajenos
+	// (precio, stock, etc.) sin quedar bloqueado; pero en cuanto el proveedor
+	// intenta tocar la geometría/rendimiento, se le exige que quede completo.
+	tocaCamposDeRol := req.Category != nil || req.RendimientoM2 != nil ||
+		req.PiezaLargoM != nil || req.PiezaAnchoM != nil || req.PiezasPorPaquete != nil
+	if tocaCamposDeRol {
+		if err := applyCategoryRules(existing); err != nil {
+			return nil, err
+		}
+	}
+
 	updated, err := uc.repo.Update(ctx, existing)
 	if err != nil {
 		return nil, domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al actualizar el producto")

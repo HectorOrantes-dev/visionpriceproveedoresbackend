@@ -78,6 +78,10 @@ func (uc *ProductUseCase) CreateProduct(ctx context.Context, providerID string, 
 		Active:           true,
 	}
 
+	if err := applyCategoryRules(product); err != nil {
+		return nil, err
+	}
+
 	created, err := uc.repo.Create(ctx, product)
 	if err != nil {
 		return nil, domainErrors.NewDomainError(domainErrors.ErrInternal, "Error al crear el producto")
