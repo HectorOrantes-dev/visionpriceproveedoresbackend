@@ -31,8 +31,11 @@ func NewSupabaseCatalogoRepository(db *pgxpool.Pool) *SupabaseCatalogoRepository
 // nearbyQuery filters by haversine distance. $1=lat, $2=lng, $3=categoria
 // patterns (text[]; empty/NULL = no filter), $4=radio_km. LEAST/GREATEST clamp
 // the acos argument to [-1,1] to avoid NaN from floating-point rounding on
-// exact-same coordinates. The category filter uses ILIKE ANY so a provider whose
-// category reads "Pintura vinílica" still matches the item's "pintura".
+// exact-same coordinates. The category filter uses ~* ANY (case-insensitive
+// regex) with word-boundary patterns from domain.ExpandCategorias, so a
+// provider whose category reads "Pintura vinílica" still matches "pintura",
+// but "azulejo" does NOT match inside "pegazulejo" (plain ILIKE '%azulejo%'
+// used to false-positive on that).
 const nearbyQuery = `
 	SELECT * FROM (
 		SELECT p.id AS producto_id, p.name AS nombre, p.category AS categoria, p.unit AS unidad,
@@ -49,7 +52,7 @@ const nearbyQuery = `
 		JOIN providers pr ON pr.id = p.provider_id
 		JOIN provider_locations pl ON pl.provider_id = pr.id
 		WHERE p.active AND pr.active
-		  AND (COALESCE(cardinality($3::text[]), 0) = 0 OR p.category ILIKE ANY($3))
+		  AND (COALESCE(cardinality($3::text[]), 0) = 0 OR p.category ~* ANY($3))
 	) t
 	WHERE t.distancia_km <= $4
 	ORDER BY t.distancia_km

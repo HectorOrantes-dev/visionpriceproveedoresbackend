@@ -1,6 +1,9 @@
 package domain
 
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 // Lógica de negocio: identificar qué proveedores tienen el material del item.
 //
@@ -11,9 +14,11 @@ import "strings"
 // para que el filtro alcance a todos los proveedores del material sin exigir que
 // escriban exactamente la misma palabra.
 //
-// El resultado son patrones para comparar con ILIKE ('%pintura%'), de modo que
-// una categoría del proveedor como "Pintura vinílica" o "Colores para muro"
-// también coincida.
+// El resultado son patrones REGEX (case-insensitive, con límite de palabra
+// \y) para comparar con `~*`, de modo que una categoría del proveedor como
+// "Pintura vinílica" o "Colores para muro" siga coincidiendo, pero "azulejo"
+// ya NO matchea dentro de "pegazulejo" (con ILIKE '%azulejo%' sí lo hacía,
+// porque "azulejo" es literalmente substring de "pegazulejo").
 
 // sinonimos mapea cada categoría canónica a las palabras clave equivalentes.
 // La clave y los valores van en minúsculas y sin acentos (ver normalizar).
@@ -29,8 +34,9 @@ var sinonimos = map[string][]string{
 }
 
 // ExpandCategorias toma el valor crudo del parámetro `categoria` (una o varias
-// categorías separadas por coma) y devuelve los patrones ILIKE con los que se
-// filtra el catálogo. Devuelve nil (sin filtro) cuando la entrada está vacía,
+// categorías separadas por coma) y devuelve los patrones regex (para usar con
+// `~*`) con los que se filtra el catálogo. Devuelve nil (sin filtro) cuando la
+// entrada está vacía,
 // para conservar el comportamiento "sin categoría = todos los productos".
 func ExpandCategorias(raw string) []string {
 	raw = strings.TrimSpace(raw)
@@ -41,7 +47,10 @@ func ExpandCategorias(raw string) []string {
 	vistos := map[string]struct{}{}
 	patrones := []string{}
 	add := func(termino string) {
-		p := "%" + termino + "%"
+		// \y = límite de palabra en regex de Postgres (equivalente a \b).
+		// Sin esto, un patrón como "azulejo" también matchea dentro de
+		// "pegazulejo" al usarse con ILIKE/substring.
+		p := `\y` + regexp.QuoteMeta(termino) + `\y`
 		if _, ok := vistos[p]; ok {
 			return
 		}

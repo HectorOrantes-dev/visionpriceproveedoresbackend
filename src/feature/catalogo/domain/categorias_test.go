@@ -16,31 +16,36 @@ func TestExpandCategorias(t *testing.T) {
 		{
 			"pintura con acentos y mayusculas",
 			"Pintura",
-			[]string{"%pintura%", "%pintar%", "%color%", "%recubrimiento%", "%esmalte%", "%vinilica%", "%laca%", "%barniz%"},
+			[]string{`\ypintura\y`, `\ypintar\y`, `\ycolor\y`, `\yrecubrimiento\y`, `\yesmalte\y`, `\yvinilica\y`, `\ylaca\y`, `\ybarniz\y`},
 		},
 		{
 			"varias categorias separadas por coma sin duplicar",
 			"pintura, piso",
 			[]string{
-				"%pintura%", "%pintar%", "%color%", "%recubrimiento%", "%esmalte%", "%vinilica%", "%laca%", "%barniz%",
-				"%piso%", "%loseta%", "%losa%", "%ceramica%", "%porcelanato%", "%porcelanico%",
+				`\ypintura\y`, `\ypintar\y`, `\ycolor\y`, `\yrecubrimiento\y`, `\yesmalte\y`, `\yvinilica\y`, `\ylaca\y`, `\ybarniz\y`,
+				`\ypiso\y`, `\yloseta\y`, `\ylosa\y`, `\yceramica\y`, `\yporcelanato\y`, `\yporcelanico\y`,
 			},
 		},
-		{"categoria desconocida usa el termino tal cual", "electricidad", []string{"%electricidad%"}},
+		{"categoria desconocida usa el termino tal cual", "electricidad", []string{`\yelectricidad\y`}},
 		{
 			"cruceta",
 			"cruceta",
-			[]string{"%cruceta%", "%crucetas%", "%separador%", "%espaciador%", "%nivelador%"},
+			[]string{`\ycruceta\y`, `\ycrucetas\y`, `\yseparador\y`, `\yespaciador\y`, `\ynivelador\y`},
 		},
 		{
 			"pegazulejo",
 			"pegazulejo",
-			[]string{"%pegazulejo%", "%pega azulejo%", "%pegazulejos%", "%adhesivo%", "%cemento cola%", "%mortero%"},
+			[]string{`\ypegazulejo\y`, `\ypega azulejo\y`, `\ypegazulejos\y`, `\yadhesivo\y`, `\ycemento cola\y`, `\ymortero\y`},
 		},
 		{
 			"emboquillado",
 			"emboquillado",
-			[]string{"%emboquillado%", "%boquillado%", "%boquilla%", "%boquillas%", "%junta%", "%fragua%"},
+			[]string{`\yemboquillado\y`, `\yboquillado\y`, `\yboquilla\y`, `\yboquillas\y`, `\yjunta\y`, `\yfragua\y`},
+		},
+		{
+			"azulejo ya no debe matchear dentro de pegazulejo (limite de palabra)",
+			"azulejo",
+			[]string{`\yazulejo\y`, `\ymosaico\y`, `\yrevestimiento\y`, `\ytalavera\y`},
 		},
 	}
 
