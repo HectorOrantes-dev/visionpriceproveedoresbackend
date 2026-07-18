@@ -94,7 +94,7 @@ func Load() *Config {
 		GmailFrom:         getEnv("GMAIL_FROM", ""),
 		GmailFromName:     getEnv("GMAIL_FROM_NAME", "VisionPrice"),
 
-		JWTExpirationMinutes:           getEnvAsInt("JWT_EXPIRATION_MINUTES", 15),
+		JWTExpirationMinutes:           getEnvAsInt("JWT_EXPIRATION_MINUTES", 10080),
 		RefreshTokenExpirationHours:    getEnvAsInt("REFRESH_TOKEN_EXPIRATION_HOURS", 168),
 		OTPExpirationMinutes:           getEnvAsInt("OTP_EXPIRATION_MINUTES", 5),
 		PasswordResetExpirationMinutes: getEnvAsInt("PASSWORD_RESET_EXPIRATION_MINUTES", 15),
